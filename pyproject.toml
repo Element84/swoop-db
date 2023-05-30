@@ -1,0 +1,81 @@
+[build-system]
+requires = [
+    "setuptools",
+    "setuptools-scm",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "swoop.db"
+authors = [
+    {name = "Jarrett Keifer", email = "jkeifer@element84.com"},
+]
+description = "Database for STAC Workflow Open Orchestration Framework"
+requires-python = ">=3.9"
+keywords = [
+    "postgresql",
+    "sql",
+    "stac",
+    "workflow",
+    "geospatial",
+]
+license = {text = "Apache License 2.0"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "asyncpg >=0.27.0",
+    "dbami >=0.1.0",
+]
+dynamic = [
+  "version",
+  "readme",
+]
+
+[project.scripts]
+swoop-db = "swoop.db.__main__:main"
+
+[project.optional-dependencies]
+dev = [
+    "black >=23.1.0",
+    "httpx >=0.24.0",
+    "isort >=5.12.0",
+    "mypy >=1.0.1",
+    "pip-tools >=6.12.3",
+    "pre-commit >=3.1.1",
+    "pre-commit-hooks >=4.4.0",
+    "pytest >=7.2.2",
+    "pytest-asyncio >=0.21.0",
+    "pytest-cov >=4.0.0",
+    "pyupgrade >=3.3.1",
+    "ruff >=0.0.253",
+    "sqlfluff >=2.1.1",
+    "sqlparse >=0.4.4",
+    "tap.py >=3.1",
+]
+
+# sadly, we need to include this non-dependency in our
+# requirements.txt to satisfy snyk, so make sure to run
+# `pip-compile` with `--extra snyk`
+snyk = [
+    "typing-extensions",
+]
+
+[tool.setuptools.dynamic]
+readme = {file = "README.md"}
+
+[tool.setuptools.packages.find]
+namespaces = true
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.sql"]
+
+[[tool.mypy.overrides]]
+module = [
+    "asyncpg",
+]
+ignore_missing_imports = true
+
+[tool.isort]
+profile = "black"

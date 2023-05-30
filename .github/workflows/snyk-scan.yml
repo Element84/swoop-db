@@ -1,0 +1,59 @@
+# This workflow sets up Snyk scans
+
+name: Snyk Scan
+
+on:
+  push:
+    branches: ["main" ]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  snyk:
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Snyk Python report vulnerabilities
+        uses: snyk/actions/python@master
+        if: success() || failure()
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args:
+            --sarif-file-output=snyk.sarif
+            --severity-threshold=critical # Forces fail on critical-severity vulnerabilities
+
+        # Push the Snyk Code results into GitHub Code Scanning tab
+      - name: Upload python scan result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        if: success() || failure()
+        with:
+          sarif_file: snyk.sarif
+
+      - name: Snyk Docker report vulnerabilities
+        uses: snyk/actions/docker@master
+        if: success() || failure()
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: python
+          args:
+            --file=Dockerfile
+            --sarif-file-output=snyk.sarif
+            --policy-path=.snyk
+            --severity-threshold=critical # Forces fail on critical-severity vulnerabilities
+
+        # Push the Snyk Code results into GitHub Code Scanning tab
+      - name: Upload docker scan result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        if: success() || failure()
+        with:
+          sarif_file: snyk.sarif

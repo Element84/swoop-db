@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres:
+    build:
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "${PGPASSWORD:-password}"
+      POSTGRES_USER: "${PGUSER:-postgres}"
+      PGUSER: "${PGUSER:-postgres}"
+      PGPASSWORD: "${PGPASSWORD:-password}"
+      PGDATABASE: "${PGDATABASE:-swoop}"
+    ports:
+      - "${PGPORT:-5432}:5432"
+    volumes:
+      - "./:/swoop/db"
+    working_dir: "/swoop/db"
