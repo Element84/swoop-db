@@ -54,12 +54,7 @@ dev = [
     "tap.py >=3.1",
 ]
 
-# sadly, we need to include this non-dependency in our
-# requirements.txt to satisfy snyk, so make sure to run
-# `pip-compile` with `--extra snyk`
-snyk = [
-    "typing-extensions",
-]
+[tool.setuptools_scm]
 
 [tool.setuptools.dynamic]
 readme = {file = "README.md"}
