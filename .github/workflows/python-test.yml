@@ -63,7 +63,6 @@ jobs:
       - name: Test with pytest
         run: |
           pytest --cov=swoop.db --cov-report=xml
-          pytest tests/test_cleanup.py
 
       - name: "Upload coverage to Codecov"
         uses: codecov/codecov-action@v3
