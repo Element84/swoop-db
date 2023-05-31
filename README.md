@@ -1,7 +1,7 @@
 # `swoop-db`
 
 The swoop database schema is managed via
-[`dbami`](https://github.com/element84/dbami), and used `dbami` to implement a
+[`dbami`](https://github.com/element84/dbami), and uses `dbami` to implement a
 custom cli and python library for managing databases for
 [swoop](https://github.com/element84/swoop).
 
@@ -76,6 +76,7 @@ To drop a database:
 ```shell
 # we'll drop the custom one we made earlier
 swoop-db drop --database swoop-custom
+```
 
 To stop the postgres container:
 
