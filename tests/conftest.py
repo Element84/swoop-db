@@ -15,7 +15,7 @@ PGTAP_DB_NAME = random_name("swoop_db_test")
 
 @pytest.fixture(scope="session")
 def pg_dump(pytestconfig):
-    env_pgd = os.getenv("SWOOP_PG_DUMP", "pg_dump")
+    env_pgd = os.getenv("SWOOP_DB_PG_DUMP", "pg_dump")
 
     if shutil.which(env_pgd):
         yield env_pgd
