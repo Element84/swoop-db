@@ -1,29 +1,38 @@
-FROM postgres:15-bullseye
+# build python venv for inclusion into image
+FROM postgres:15-bullseye as APP
+RUN apt-get update && apt-get install -y git python3-venv
+WORKDIR /opt/swoop/db
+RUN python3 -m venv --copies swoop-db-venv
+COPY requirements.txt .
+RUN ls ./swoop-db-venv/bin/
+RUN ./swoop-db-venv/bin/pip install -r requirements.txt
+COPY ./src ./src
+COPY README.md pyproject.toml LICENSE .
+RUN --mount=source=.git,target=.git,type=bind ./swoop-db-venv/bin/pip install .
 
+
+FROM postgres:15-bullseye
 # install build deps and pg_partman
 RUN set -x && \
     apt-get update && \
-    apt-get install -y postgresql-15-partman curl make patch python3-pip && \
+    apt-get install -y postgresql-15-partman curl make patch && \
     apt-get clean -y && \
     rm -r /var/lib/apt/lists/*
 
 # install pgtap
+ARG PGTAP_VERSION=1.2.0
 RUN set -x && \
     tmp="$(mktemp -d)" && \
     trap "rm -rf '$tmp'" EXIT && \
     cd "$tmp" && \
-    curl -fsSL https://github.com/theory/pgtap/archive/refs/tags/v1.2.0.tar.gz -o pgtap.tar.gz && \
+    curl -fsSL https://github.com/theory/pgtap/archive/refs/tags/v${PGTAP_VERSION}.tar.gz \
+        -o pgtap.tar.gz && \
     tar -xzf pgtap.tar.gz --strip-components 1 && \
     make install
-
-WORKDIR /swoop/db
-COPY requirements.txt .
-RUN pip3 install -r requirements.txt
-COPY ./src ./src
-COPY README.md pyproject.toml LICENSE .
-RUN pip3 install .
 
 ENV PGDATABASE: "${PGDATABASE:-swoop}" \
     PGUSER: "${PGUSER:-postgres}"
 
-RUN python3 -V
+# copy the python venv into this output image and add it's bin to the path
+COPY --from=APP /opt/swoop/db/swoop-db-venv /opt/swoop/db/swoop-db-venv
+ENV PATH=/opt/swoop/db/swoop-db-venv/bin:$PATH
