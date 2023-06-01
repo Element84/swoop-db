@@ -15,6 +15,7 @@ jobs:
     env:
       context: .
       image_name: swoop-db
+      image_repository: ${{ secrets.REGISTRY_REPOSITORY }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -45,7 +46,7 @@ jobs:
           fi
 
           for tag in "${TAGS[@]}"; do
-              echo ${{ secrets.REGISTRY_REPOSITORY }}/${{ env.image_name }}:${tag}
+              echo ${{ env.image_repository }}/${{ env.image_name }}:${tag}
           done
 
       - name: Set up QEMU
