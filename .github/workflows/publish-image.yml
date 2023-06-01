@@ -47,7 +47,7 @@ jobs:
           fi
 
           for tag in "${TAGS[@]}"; do
-              echo ${{ secrets.REGISTRY_REPOSITORY }}/${{ env.image_name }}/${tag}
+              echo ${{ secrets.REGISTRY_REPOSITORY }}/${{ env.image_name }}:${tag}
           done
 
       - name: Set up QEMU
