@@ -48,6 +48,11 @@ jobs:
 
           ( IFS=$','; echo "${TAGS[*]}" )
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          buildkitd-flags: --debug
+
       - name: Build and publish image to Quay
         uses: docker/build-push-action@v1
         with:
