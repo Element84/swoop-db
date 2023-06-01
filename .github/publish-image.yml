@@ -9,7 +9,7 @@ on:
       - ./version.json
   pull_request:
     branches:
-      - '*'
+      - main
 
 jobs:
   build:
