@@ -19,15 +19,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install setuptools-scm
+
       - name: Get image tags
         id: image_tags
         run: |
           echo -n ::set-output name=IMAGE_TAGS::
-          VERSION=$(jq -r '.version' ${context}/version.json)
-          TAGS=('latest')
-          if [ "${VERSION}" ] && [ "${VERSION}" != "latest" ]; then
-              TAGS+=("${VERSION}")
-          fi
+          VERSION="$(python -m setuptools_scm)"
+          TAGS=('latest' "${VERSION}")
           if [[ "${GITHUB_REF}" =~ refs/tags/(.*) ]]; then
               TAGS+=("git-${BASH_REMATCH[1]}")
           fi
