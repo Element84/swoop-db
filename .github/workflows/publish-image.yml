@@ -47,7 +47,7 @@ jobs:
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "IMAGE_TAGS<<$EOF" >> "$GITHUB_ENV"
           for tag in "${TAGS[@]}"; do
-              echo ${{ env.image_repository }}/${{ env.image_name }}:${tag}
+              echo ${{ env.image_repository }}/${{ env.image_name }}:${tag} >> "$GITHUB_ENV"
           done
           echo "$EOF" >> "$GITHUB_ENV"
 
