@@ -39,7 +39,7 @@ jobs:
           if [ -n "${{github.event.release.tag_name}}" ]; then
             MAJOR="$(<<<"${VERSION}" cut -d '.' -f 1)"
             MINOR="${MAJOR}.$(<<<"${VERSION}" cut -d '.' -f 2)"
-            TAGS+=("${MAJOR}" "${MINOR}"
+            TAGS+=("${MAJOR}" "${MINOR}")
           fi
 
           if [[ "${GITHUB_REF}" =~ refs/tags/(.*) ]]; then
