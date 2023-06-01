@@ -15,7 +15,7 @@ jobs:
     env:
       context: .
       image_name: swoop-db
-      image_repository: ${{ secrets.REGISTRY_REPOSITORY }}
+      image_repository: element84
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -31,7 +31,6 @@ jobs:
       - name: Get image tags
         id: image_tags
         run: |
-          echo -n ::set-output name=IMAGE_TAGS::
           VERSION="$(python -m setuptools_scm | tr + -)"
           TAGS=("${VERSION}")
 
@@ -45,9 +44,12 @@ jobs:
               TAGS+=("git-${BASH_REMATCH[1]}")
           fi
 
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "IMAGE_TAGS<<$EOF" >> "$GITHUB_ENV"
           for tag in "${TAGS[@]}"; do
               echo ${{ env.image_repository }}/${{ env.image_name }}:${tag}
           done
+          echo "$EOF" >> "$GITHUB_ENV"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
