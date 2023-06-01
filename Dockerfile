@@ -7,7 +7,7 @@ COPY requirements.txt .
 RUN ls ./swoop-db-venv/bin/
 RUN ./swoop-db-venv/bin/pip install -r requirements.txt
 COPY ./src ./src
-COPY README.md pyproject.toml LICENSE .
+COPY README.md pyproject.toml LICENSE ./
 RUN --mount=source=.git,target=.git,type=bind ./swoop-db-venv/bin/pip install .
 
 
