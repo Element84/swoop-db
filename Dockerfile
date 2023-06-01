@@ -4,12 +4,9 @@ RUN apt-get update && apt-get install -y git python3-venv
 WORKDIR /opt/swoop/db
 RUN python3 -m venv --copies swoop-db-venv
 COPY requirements.txt .
-RUN ls ./swoop-db-venv/bin/
 RUN ./swoop-db-venv/bin/pip install -r requirements.txt
-COPY ./src ./src
-COPY README.md pyproject.toml LICENSE ./
-RUN --mount=source=.git,target=.git,type=bind ./swoop-db-venv/bin/pip install .
-
+RUN --mount=source=.git,target=.git,type=bind git clone . clone
+RUN ./swoop-db-venv/bin/pip install ./clone
 
 FROM postgres:15-bullseye
 # install build deps and pg_partman
