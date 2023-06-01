@@ -1,5 +1,8 @@
 name: Publish Image
 on:
+  release:
+    types:
+      - published
   push:
     branches:
       - main
@@ -30,11 +33,19 @@ jobs:
         id: image_tags
         run: |
           echo -n ::set-output name=IMAGE_TAGS::
-          VERSION="$(python -m setuptools_scm)"
+          VERSION="$(python -m setuptools_scm | tr + -)"
           TAGS=('latest' "${VERSION}")
+
+          if [ -n "${{github.event.release.tag_name}}" ]; then
+            MAJOR="$(<<<"${VERSION}" cut -d '.' -f 1)"
+            MINOR="${MAJOR}.$(<<<"${VERSION}" cut -d '.' -f 2)"
+            TAGS+=("${MAJOR}" "${MINOR}"
+          fi
+
           if [[ "${GITHUB_REF}" =~ refs/tags/(.*) ]]; then
               TAGS+=("git-${BASH_REMATCH[1]}")
           fi
+
           ( IFS=$','; echo "${TAGS[*]}" )
 
       - name: Build and publish image to Quay
