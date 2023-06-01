@@ -5,8 +5,6 @@ on:
       - main
     tags:
       - '*'
-    paths:
-      - ./version.json
   pull_request:
     branches:
       - '*'
@@ -19,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -37,6 +36,7 @@ jobs:
               TAGS+=("git-${BASH_REMATCH[1]}")
           fi
           ( IFS=$','; echo "${TAGS[*]}" )
+
       - name: Build and publish image to Quay
         uses: docker/build-push-action@v1
         with:
