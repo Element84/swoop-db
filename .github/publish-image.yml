@@ -8,7 +8,8 @@ on:
     paths:
       - ./version.json
   pull_request:
-    branches: ["*"]
+    branches:
+      - '*'
 
 jobs:
   build:
