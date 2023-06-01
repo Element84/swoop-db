@@ -72,4 +72,4 @@ jobs:
           context: ${{ env.context }}
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name == 'release' }}
-          tags: ${{ steps.image_tags.outputs.IMAGE_TAGS }}
+          tags: ${{ env.IMAGE_TAGS }}
