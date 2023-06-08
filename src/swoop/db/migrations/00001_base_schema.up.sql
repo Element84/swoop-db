@@ -1,4 +1,4 @@
-INSERT INTO schema_version VALUES(1);
+INSERT INTO swoop.schema_version VALUES(1);
 
 CREATE FUNCTION swoop.check_cache(plhash bytea, wf_version smallint, wf_name text, invalid timestamptz)
 RETURNS RECORD
