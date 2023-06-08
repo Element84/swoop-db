@@ -11,6 +11,8 @@ services:
       PGUSER: "${PGUSER:-postgres}"
       PGPASSWORD: "${PGPASSWORD:-password}"
       PGDATABASE: "${PGDATABASE:-swoop}"
+      POSTGRES_HOST_AUTH_METHOD: "${PGAUTHMETHOD:-trust}"
+      PGAUTHMETHOD: "${PGAUTHMETHOD:-trust}"
     ports:
       - "${PGPORT:-5432}:5432"
     volumes:
