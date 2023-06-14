@@ -24,13 +24,11 @@ INSERT INTO swoop.input_item (item_uuid, item_id, collection) VALUES (
 INSERT INTO swoop.payload_cache (
   payload_uuid,
   payload_hash,
-  workflow_version,
   workflow_name,
   created_at
 ) VALUES (
   'ade69fe7-1d7d-472e-9f36-7242cc2aca77',
   decode('PsqWxdKjAjrV1+BueXnAS1cWIhU=', 'base64'),
-  1,
   'some_workflow',
   '2023-04-28 15:49:00+00'
 );
@@ -54,7 +52,8 @@ INSERT INTO swoop.action (
   parent_uuid,
   created_at,
   priority,
-  payload_uuid
+  payload_uuid,
+  workflow_version
 ) VALUES (
   '2595f2da-81a6-423c-84db-935e6791046e',
   'workflow',
@@ -63,7 +62,8 @@ INSERT INTO swoop.action (
   'cf8ff7f0-ce5d-4de6-8026-4e551787385f',
   '2023-04-28 15:49:00+00',
   100,
-  'ade69fe7-1d7d-472e-9f36-7242cc2aca77'
+  'ade69fe7-1d7d-472e-9f36-7242cc2aca77',
+  1
 );
 INSERT INTO swoop.action (
   action_uuid,
@@ -73,7 +73,8 @@ INSERT INTO swoop.action (
   parent_uuid,
   created_at,
   priority,
-  payload_uuid
+  payload_uuid,
+  workflow_version
 ) VALUES (
   '81842304-0aa9-4609-89f0-1c86819b0752',
   'workflow',
@@ -82,7 +83,8 @@ INSERT INTO swoop.action (
   '2595f2da-81a6-423c-84db-935e6791046e',
   '2023-04-28 15:49:00+00',
   100,
-  'ade69fe7-1d7d-472e-9f36-7242cc2aca77'
+  'ade69fe7-1d7d-472e-9f36-7242cc2aca77',
+  1
 );
 
 -- threads
