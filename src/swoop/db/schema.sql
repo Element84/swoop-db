@@ -8,7 +8,7 @@ CREATE TABLE swoop.schema_version (
   applied_at timestamptz DEFAULT now()
 );
 
-INSERT INTO swoop.schema_version (version) VALUES (0);
+INSERT INTO swoop.schema_version (version) VALUES (1);
 
 
 CREATE TABLE swoop.event_state (
@@ -41,7 +41,6 @@ INSERT INTO swoop.event_state (name, description) VALUES
 CREATE TABLE swoop.payload_cache (
   payload_uuid uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   payload_hash bytea UNIQUE,
-  workflow_version smallint NOT NULL,
   workflow_name text NOT NULL,
   created_at timestamptz NOT NULL DEFAULT now(),
   invalid_after timestamptz
@@ -59,6 +58,7 @@ CREATE TABLE swoop.action (
   created_at timestamptz NOT NULL DEFAULT now(),
   priority smallint DEFAULT 100,
   payload_uuid uuid REFERENCES swoop.payload_cache ON DELETE RESTRICT,
+  workflow_version smallint NOT NULL,
 
   CONSTRAINT workflow_or_callback CHECK (
     CASE

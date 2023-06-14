@@ -5,14 +5,12 @@ SELECT plan(13);
 INSERT INTO swoop.payload_cache (
   payload_uuid,
   payload_hash,
-  workflow_version,
   workflow_name,
   created_at,
   invalid_after
 ) VALUES (
   'cdc73916-500c-4501-a658-dd706a943d19'::uuid,
   decode('123\000456', 'escape'),
-  1,
   'workflow-a',
   '2023-04-14 00:25:07.388012+00'::timestamptz,
   '2023-04-20 00:25:07.388012+00'::timestamptz
@@ -24,14 +22,16 @@ INSERT INTO swoop.action (
   handler_name,
   action_name,
   created_at,
-  payload_uuid
+  payload_uuid,
+  workflow_version
 ) VALUES (
   'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
   'workflow',
   'argo-workflow',
   'workflow-a',
   '2023-04-13 00:25:07.388012+00'::timestamptz,
-  'cdc73916-500c-4501-a658-dd706a943d19'::uuid
+  'cdc73916-500c-4501-a658-dd706a943d19'::uuid,
+  1
 );
 
 -- check event created as expected
