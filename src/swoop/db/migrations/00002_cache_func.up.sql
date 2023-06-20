@@ -47,7 +47,7 @@ $$;
 DROP FUNCTION IF EXISTS swoop.check_cache;
 
 CREATE FUNCTION swoop.check_cache(plhash bytea)
-RETURNS RECORD
+RETURNS record
 LANGUAGE plpgsql VOLATILE
 AS $$
 DECLARE
@@ -57,8 +57,6 @@ BEGIN
     -- An entry exists in the cache
         DECLARE
             v_status text;
-            v_job_id uuid;
-            v_payload_id uuid;
         BEGIN
             SELECT t.status
             INTO v_status
@@ -69,7 +67,7 @@ BEGIN
             ON a.action_uuid = t.action_uuid
             WHERE p.payload_hash = plhash
             ORDER BY t.created_at DESC
-			LIMIT 1;
+			      LIMIT 1;
 
             IF v_status IN ('RUNNING', 'PENDING', 'QUEUED', 'BACKOFF', 'SUCCESSFUL', 'INVALID') THEN
             -- Redirect to job details for that workflow, and do not process

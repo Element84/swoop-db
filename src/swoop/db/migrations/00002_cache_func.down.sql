@@ -56,8 +56,10 @@ $$;
 
 DROP FUNCTION IF EXISTS swoop.check_cache;
 
-CREATE FUNCTION swoop.check_cache(plhash bytea, wf_version smallint, wf_name text, invalid timestamptz)
-RETURNS RECORD
+CREATE FUNCTION swoop.check_cache(
+  plhash bytea, wf_version smallint, wf_name text, invalid timestamptz
+)
+RETURNS record
 LANGUAGE plpgsql VOLATILE
 AS $$
 DECLARE
