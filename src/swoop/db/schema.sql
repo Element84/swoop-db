@@ -451,9 +451,9 @@ BEGIN
             INTO v_status
             FROM swoop.payload_cache p
             INNER JOIN swoop.action a
-            ON p.payload_uuid = a.payload_uuid
+            USING (payload_uuid)
             INNER JOIN swoop.thread t
-            ON a.action_uuid = t.action_uuid
+            USING (action_uuid)
             WHERE p.payload_hash = plhash
             ORDER BY t.created_at DESC
 			      LIMIT 1;
