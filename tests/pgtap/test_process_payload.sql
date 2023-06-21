@@ -5,28 +5,44 @@ SELECT plan(7);
 SAVEPOINT nothing_inserted;
 
 
-INSERT INTO swoop.payload_cache (payload_uuid, payload_hash, workflow_name)
+INSERT INTO swoop.payload_cache (
+  payload_uuid,
+  payload_hash,
+  workflow_name
+)
 VALUES (
   'e8d87aa6-6c42-47ed-a33c-94498fb2c20e',
   convert_to('hash1', 'utf-8'),
   'mirror'
 );
 
-INSERT INTO swoop.payload_cache (payload_uuid, payload_hash, workflow_name)
+INSERT INTO swoop.payload_cache (
+  payload_uuid,
+  payload_hash,
+  workflow_name
+)
 VALUES (
   'b262902b-b968-4cad-aabc-8f26f3d048e2',
   convert_to('hash2', 'utf-8'),
   'mirror'
 );
 
-INSERT INTO swoop.payload_cache (payload_uuid, payload_hash, workflow_name)
+INSERT INTO swoop.payload_cache (
+  payload_uuid,
+  payload_hash,
+  workflow_name
+)
 VALUES (
   'd5d64165-82df-4836-b78e-af4daee55d38',
   convert_to('hash3', 'utf-8'),
   'cirrus'
 );
 
-INSERT INTO swoop.payload_cache (payload_uuid, payload_hash, workflow_name)
+INSERT INTO swoop.payload_cache (
+  payload_uuid,
+  payload_hash,
+  workflow_name
+)
 VALUES (
   '737490d3-fba6-4236-af35-ec6ef9d25ec8',
   convert_to('hash4', 'utf-8'),
@@ -129,7 +145,6 @@ INSERT INTO swoop.thread VALUES (
   null
 );
 
-SAVEPOINT thread_inserted;
 
 SELECT results_eq(
   $$
