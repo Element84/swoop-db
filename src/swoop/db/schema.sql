@@ -3,14 +3,6 @@ CREATE SCHEMA partman;
 CREATE EXTENSION pg_partman SCHEMA partman;
 
 
-CREATE TABLE swoop.schema_version (
-  version integer,
-  applied_at timestamptz DEFAULT now()
-);
-
-INSERT INTO swoop.schema_version (version) VALUES (2);
-
-
 CREATE TABLE swoop.event_state (
   name text PRIMARY KEY,
   description text NOT NULL

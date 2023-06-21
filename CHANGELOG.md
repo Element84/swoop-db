@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update [dbami] dependency to v0.2.0 ([#15])
 - Disable CLI command `new` unless editable install to prevent
   creating migration files in non-editable installs ([#15])
+- Schema no longer needs to manage schema version table or updates ([#15])
 
 ## [v0.1.0] - 2023-05-31
 
