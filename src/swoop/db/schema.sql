@@ -435,40 +435,38 @@ BEGIN
 END;
 $$;
 
-CREATE FUNCTION swoop.check_cache(plhash bytea)
-RETURNS record
+CREATE FUNCTION swoop.process_payload(plhash bytea, wf_version smallint)
+RETURNS uuid
 LANGUAGE plpgsql VOLATILE
 AS $$
 DECLARE
-  rec RECORD;
+  v_status text;
+  n_version smallint;
+  d_invalid timestamptz;
+  v_action_id uuid;
 BEGIN
-    IF EXISTS (SELECT * FROM swoop.payload_cache WHERE payload_hash = plhash) THEN
-    -- An entry exists in the cache
-        DECLARE
-            v_status text;
-        BEGIN
-            SELECT t.status
-            INTO v_status
-            FROM swoop.payload_cache p
-            INNER JOIN swoop.action a
-            USING (payload_uuid)
-            INNER JOIN swoop.thread t
-            USING (action_uuid)
-            WHERE p.payload_hash = plhash
-            ORDER BY t.created_at DESC
-			      LIMIT 1;
+  SELECT t.status, a.workflow_version, p.invalid_after, a.action_uuid
+  INTO v_status, n_version, d_invalid, v_action_id
+  FROM swoop.payload_cache p
+  INNER JOIN swoop.action a
+  USING (payload_uuid)
+  INNER JOIN swoop.thread t
+  USING (action_uuid)
+  WHERE p.payload_hash = plhash
+  ORDER BY t.created_at DESC
+  LIMIT 1;
 
-            IF v_status IN ('RUNNING', 'PENDING', 'QUEUED', 'BACKOFF', 'SUCCESSFUL', 'INVALID') THEN
-            -- Redirect to job details for that workflow, and do not process
-                SELECT FALSE INTO rec;
-            ELSE
-                -- Reprocess payload
-                SELECT TRUE INTO rec;
-            END IF;
-        END;
-	ELSE
-        SELECT TRUE INTO rec;
-	END IF;
-    RETURN rec;
+  IF v_status IN ('RUNNING', 'PENDING', 'QUEUED', 'BACKOFF') THEN
+  -- Redirect to job details for that workflow, and do not process
+    RETURN v_action_id;
+  ELSIF wf_version > n_version THEN
+    RETURN null;
+  ELSIF d_invalid IS NOT NULL and d_invalid > now() THEN
+    RETURN null;
+  ELSIF v_status IN ('SUCCESSFUL', 'INVALID') THEN
+    RETURN v_action_id;
+  ELSE
+    RETURN null;
+  END IF;
 END;
 $$;

@@ -54,7 +54,7 @@ $$;
 
 -- Update check_cache function to original state
 
-DROP FUNCTION IF EXISTS swoop.check_cache;
+DROP FUNCTION IF EXISTS swoop.process_payload;
 
 CREATE FUNCTION swoop.check_cache(
   plhash bytea, wf_version smallint, wf_name text, invalid timestamptz
