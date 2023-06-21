@@ -1,4 +1,6 @@
 import argparse
+import json
+from importlib import metadata
 
 import dbami.cli as dbcli
 
@@ -43,9 +45,24 @@ dbcli.Arguments = SwoopArgs  # type: ignore
 dbcli.DbamiCommand = SwoopCommand  # type: ignore
 
 
-def get_cli() -> dbcli.DbamiCLI:
-    dbcli.DbamiCLI.commands.pop("init")
-    cli: dbcli.DbamiCLI = dbcli.DbamiCLI(
-        prog="swoop-db", description="Custom dbami cli instance for swoop-db"
+def is_editable_install(pkg_name: str) -> bool:
+    dist = metadata.distribution(pkg_name)
+    return (
+        json.loads(dist.read_text("direct_url.json") or "{}")
+        .get("dir_info", {})
+        .get("editable", False)
     )
-    return cli
+
+
+def get_cli() -> dbcli.DbamiCLI:
+    # by definition swoop.db has a project, we don't want init
+    dbcli.DbamiCLI.commands.pop("init")
+
+    # we don't want to create new migrations in a non-editable install
+    if not is_editable_install(__package__):
+        dbcli.DbamiCLI.commands.pop("new")
+
+    return dbcli.DbamiCLI(
+        prog="swoop-db",
+        description="Custom dbami cli instance for swoop-db",
+    )
