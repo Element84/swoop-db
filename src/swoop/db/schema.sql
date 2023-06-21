@@ -461,7 +461,7 @@ BEGIN
     RETURN v_action_id;
   ELSIF wf_version > n_version THEN
     RETURN null;
-  ELSIF d_invalid IS NOT NULL and d_invalid > now() THEN
+  ELSIF d_invalid IS NOT NULL and d_invalid < now() THEN
     RETURN null;
   ELSIF v_status IN ('SUCCESSFUL', 'INVALID') THEN
     RETURN v_action_id;
