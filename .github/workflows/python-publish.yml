@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
+  build-publish:
 
     runs-on: ubuntu-latest
 
@@ -22,6 +22,17 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install build
+        pip install -r requirements.txt
+        pip install .
+    - name: Check major version matches migration
+      run: |
+        MAX_MIGRATION="$(./bin/get-max-migration-version.py)"
+        test "$MAX_MIGRATION" -eq "$(<<<"$GITHUB_REF_NAME" tr -d 'v' | cut -d '.' -f 1)" || {
+          echo "Release tag $GITHUB_REF_NAME major version != max migration version $MAX_MIGRATION."
+          echo "Release major version must equal the max migration version."
+          echo "Hint: maybe edit the release to use a tag value with a major version of $MAX_MIGRATION."
+          exit 1
+        }
     - name: Build package
       run: python -m build
     - name: Publish package
