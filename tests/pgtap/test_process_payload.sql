@@ -4,7 +4,7 @@ SELECT plan(7);
 
 SELECT results_eq(
   $$
-    SELECT swoop.process_payload(convert_to('hash_test', 'utf-8'), 1::smallint)
+    SELECT swoop.find_cached_action_for_payload(convert_to('hash_test', 'utf-8'), 1::smallint)
   $$,
   $$
     VALUES (
@@ -58,7 +58,7 @@ INSERT INTO swoop.payload_cache (
 
 SELECT results_eq(
   $$
-    SELECT swoop.process_payload(convert_to('hash1', 'utf-8'), 2::smallint)
+    SELECT swoop.find_cached_action_for_payload(convert_to('hash1', 'utf-8'), 2::smallint)
   $$,
   $$
     VALUES (
@@ -165,7 +165,7 @@ WHERE action_uuid = '7716319b-5064-41fc-be04-0e1330c0c290';
 
 SELECT results_eq(
   $$
-    SELECT swoop.process_payload(convert_to('hash4', 'utf-8'), 2::smallint)
+    SELECT swoop.find_cached_action_for_payload(convert_to('hash4', 'utf-8'), 2::smallint)
   $$,
   $$
     VALUES (
@@ -259,7 +259,7 @@ INSERT INTO swoop.thread (
 
 SELECT results_eq(
   $$
-    SELECT swoop.process_payload(convert_to('hash1', 'utf-8'), 2::smallint)
+    SELECT swoop.find_cached_action_for_payload(convert_to('hash1', 'utf-8'), 2::smallint)
   $$,
   $$
     VALUES (
@@ -272,7 +272,7 @@ SELECT results_eq(
 
 SELECT results_eq(
   $$
-    SELECT swoop.process_payload(convert_to('hash1', 'utf-8'), 3::smallint)
+    SELECT swoop.find_cached_action_for_payload(convert_to('hash1', 'utf-8'), 3::smallint)
   $$,
   $$
     VALUES (
@@ -285,7 +285,7 @@ SELECT results_eq(
 
 SELECT results_eq(
   $$
-    SELECT swoop.process_payload(convert_to('hash1', 'utf-8'), 4::smallint)
+    SELECT swoop.find_cached_action_for_payload(convert_to('hash1', 'utf-8'), 4::smallint)
   $$,
   $$
     VALUES (
@@ -308,7 +308,7 @@ WHERE action_uuid = '81842304-0aa9-4609-89f0-1c86819b0752';
 
 SELECT results_eq(
   $$
-    SELECT swoop.process_payload(convert_to('hash1', 'utf-8'), 3::smallint)
+    SELECT swoop.find_cached_action_for_payload(convert_to('hash1', 'utf-8'), 3::smallint)
   $$,
   $$
     VALUES (
