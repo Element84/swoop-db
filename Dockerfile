@@ -27,8 +27,8 @@ RUN set -x && \
     tar -xzf pgtap.tar.gz --strip-components 1 && \
     make install
 
-ENV PGDATABASE: "${PGDATABASE:-swoop}" \
-    PGUSER: "${PGUSER:-postgres}"
+ENV PGDATABASE: "${PGDATABASE:-swoop}"
+ENV PGUSER: "${PGUSER:-postgres}"
 
 # copy the python venv into this output image and add it's bin to the path
 COPY --from=APP /opt/swoop/db/swoop-db-venv /opt/swoop/db/swoop-db-venv
