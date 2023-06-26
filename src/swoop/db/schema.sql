@@ -60,6 +60,7 @@ CREATE TABLE swoop.action (
       WHEN action_type = 'workflow' THEN
         action_name IS NOT NULL
         AND payload_uuid IS NOT NULL
+        AND parent_uuid IS NULL
     END
   )
 ) PARTITION BY RANGE (created_at);
