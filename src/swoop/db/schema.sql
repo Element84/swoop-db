@@ -111,7 +111,8 @@ CREATE TABLE swoop.thread ( -- noqa
     MINVALUE -2147483648
     START WITH 1
     CYCLE
-  )
+  ),
+  started_at timestamptz NOT NULL
 ) PARTITION BY RANGE (created_at);
 
 CREATE INDEX ON swoop.thread (created_at);
@@ -226,13 +227,17 @@ AS $$
 DECLARE
   _latest timestamptz;
   _next_attempt timestamptz;
+  _started timestamptz;
 BEGIN
-  SELECT last_update FROM swoop.thread WHERE action_uuid = NEW.action_uuid INTO _latest;
+  SELECT last_update, started_at FROM swoop.thread WHERE action_uuid = NEW.action_uuid
+    INTO _latest, _started;
 
   -- If the event time is older than the last update we don't update the thread
   -- (we can't use a trigger condition to filter this because we don't know the
   -- last update time from the event alone).
   IF _latest IS NOT NULL AND NEW.event_time < _latest THEN
+    IF NEW.status = 'RUNNING' THEN
+        UPDATE swoop.thread as t SET started_at = NEW.event_time WHERE t.action_uuid = NEW.action_uuid;
     RETURN NULL;
   END IF;
 
@@ -241,11 +246,16 @@ BEGIN
     SELECT NEW.event_time + (NEW.retry_seconds * interval '1 second') INTO _next_attempt;
   END IF;
 
+  IF _started IS NULL AND NEW.status = 'RUNNING' THEN
+    SELECT  NEW.event_time INTO _started;
+  END IF;
+
   UPDATE swoop.thread as t SET
     last_update = NEW.event_time,
     status = NEW.status,
     next_attempt_after = _next_attempt,
-    error = NEW.error
+    error = NEW.error,
+    started_at = _started
   WHERE
     t.action_uuid = NEW.action_uuid;
 
