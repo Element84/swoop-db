@@ -46,7 +46,9 @@ $$;
 
 DROP FUNCTION IF EXISTS swoop.check_cache;
 
-CREATE FUNCTION swoop.find_cached_action_for_payload(plhash bytea, wf_version smallint)
+CREATE FUNCTION swoop.find_cached_action_for_payload(
+  plhash bytea, wf_version smallint
+)
 RETURNS uuid
 LANGUAGE plpgsql VOLATILE
 AS $$
