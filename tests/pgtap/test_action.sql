@@ -66,7 +66,8 @@ SELECT results_eq(
       last_update,
       action_uuid,
       status,
-      next_attempt_after
+      next_attempt_after,
+      started_at
     FROM
       swoop.thread
     WHERE
@@ -77,6 +78,7 @@ SELECT results_eq(
       '2023-04-13 00:25:07.388012+00'::timestamptz,
       'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
       'PENDING',
+      null::timestamptz,
       null::timestamptz
     )
   $$,

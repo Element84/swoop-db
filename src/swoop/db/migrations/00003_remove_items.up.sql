@@ -1,2 +1,2 @@
-DROP table swoop.item_payload;
-DROP table swoop.input_item;
+DROP TABLE swoop.item_payload;
+DROP TABLE swoop.input_item;
