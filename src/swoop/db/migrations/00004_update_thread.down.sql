@@ -1,8 +1,6 @@
 ALTER TABLE swoop.thread
 DROP COLUMN started_at;
 
-ALTER TABLE swoop.thread_template
-DROP COLUMN started_at;
 
 CREATE OR REPLACE FUNCTION swoop.update_thread()
 RETURNS trigger

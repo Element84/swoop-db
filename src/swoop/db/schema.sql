@@ -50,6 +50,7 @@ CREATE TABLE swoop.action (
   priority smallint DEFAULT 100,
   payload_uuid uuid REFERENCES swoop.payload_cache ON DELETE RESTRICT,
   workflow_version smallint NOT NULL,
+  handler_type text NOT NULL,
 
   CONSTRAINT workflow_or_callback CHECK (
     CASE

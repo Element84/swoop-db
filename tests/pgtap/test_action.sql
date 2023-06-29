@@ -20,6 +20,7 @@ INSERT INTO swoop.action (
   action_uuid,
   action_type,
   handler_name,
+  handler_type,
   action_name,
   created_at,
   payload_uuid,
@@ -27,6 +28,7 @@ INSERT INTO swoop.action (
 ) VALUES (
   'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
   'workflow',
+  'argo-handler',
   'argo-workflow',
   'workflow-a',
   '2023-04-13 00:25:07.388012+00'::timestamptz,
@@ -113,7 +115,7 @@ SELECT results_eq(
     FROM
       swoop.get_processable_actions(
         _ignored_action_uuids => array[]::uuid[],
-        _handler_names => array['argo-workflow']
+        _handler_names => array['argo-handler']
       )
   $$,
   $$
@@ -214,7 +216,7 @@ SELECT results_eq(
     FROM
       swoop.get_processable_actions(
         _ignored_action_uuids => array[]::uuid[],
-        _handler_names => array['argo-workflow']
+        _handler_names => array['argo-handler']
       )
   $$,
   $$

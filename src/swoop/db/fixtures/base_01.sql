@@ -21,7 +21,8 @@ INSERT INTO swoop.action (
   created_at,
   priority,
   payload_uuid,
-  workflow_version
+  workflow_version,
+  handler_type
 ) VALUES (
   '2595f2da-81a6-423c-84db-935e6791046e',
   'workflow',
@@ -31,7 +32,8 @@ INSERT INTO swoop.action (
   '2023-04-28 15:49:00+00',
   100,
   'ade69fe7-1d7d-472e-9f36-7242cc2aca77',
-  1
+  1,
+  'argo-workflow'
 );
 INSERT INTO swoop.action (
   action_uuid,
@@ -42,7 +44,8 @@ INSERT INTO swoop.action (
   created_at,
   priority,
   payload_uuid,
-  workflow_version
+  workflow_version,
+  handler_type
 ) VALUES (
   '81842304-0aa9-4609-89f0-1c86819b0752',
   'workflow',
@@ -52,7 +55,8 @@ INSERT INTO swoop.action (
   '2023-04-28 15:49:00+00',
   100,
   'ade69fe7-1d7d-472e-9f36-7242cc2aca77',
-  1
+  1,
+  'cirrus-workflow'
 );
 
 -- threads
