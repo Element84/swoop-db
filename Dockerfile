@@ -1,5 +1,5 @@
 # build python venv for inclusion into image
-FROM postgres:15-bullseye as APP
+FROM postgres:15 as APP
 RUN apt-get update && apt-get install -y git python3-venv
 WORKDIR /opt/swoop/db
 RUN python3 -m venv --copies swoop-db-venv
