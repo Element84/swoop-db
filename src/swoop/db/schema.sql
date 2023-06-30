@@ -29,19 +29,10 @@ INSERT INTO swoop.event_state (name, description) VALUES
 ('INFO', 'Event is informational and does not change thread state');
 
 
-CREATE TABLE swoop.payload_cache (
-  payload_uuid uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  payload_hash bytea UNIQUE,
-  workflow_name text NOT NULL,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  invalid_after timestamptz
-);
-
-CREATE INDEX ON swoop.payload_cache (payload_hash);
-
--- gen_uuid_v7() from https://gist.github.com/kjmph/5bd772b2c2df145aa645b837da7eca74
+-- gen_uuid_v7() modified from
+-- https://gist.github.com/kjmph/5bd772b2c2df145aa645b837da7eca74
 --
--- License:
+-- Original license:
 --
 -- Copyright 2023 Kyle Hubert <kjmph@users.noreply.github.com>
 -- (https://github.com/kjmph)
@@ -89,7 +80,23 @@ BEGIN
   );
 
   RETURN encode(_uuid_bytes, 'hex')::uuid;
-END
+END;
+$$;
+
+
+CREATE FUNCTION public.uuid_version(_uuid_bytes bytea)
+RETURNS integer
+LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $$
+  SELECT get_byte(_uuid_bytes, 6)::bit(8)::bit(4)::int;
+$$;
+
+
+CREATE FUNCTION public.uuid_version(_uuid uuid)
+RETURNS integer
+LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+AS $$
+  SELECT uuid_version(uuid_send(_uuid));
 $$;
 
 
@@ -102,7 +109,7 @@ DECLARE
   _uuid_bytes bytea;
 BEGIN
   SELECT uuid_send(_uuid) INTO _uuid_bytes;
-  SELECT get_byte( _uuid_bytes, 6)::bit(8)::bit(4)::int INTO _uuid_version;
+  SELECT uuid_version(_uuid_bytes) INTO _uuid_version;
 
   IF _uuid_version != 7 THEN
     RAISE EXCEPTION 'UUID must be version 7, not %', _uuid_version
@@ -113,8 +120,16 @@ BEGIN
     substring(_uuid_bytes FOR 4) || substring(_uuid_bytes FROM 5 FOR 2),
     'hex'
   ))::bit(64)::bigint::numeric / 1000);
-END
+END;
 $$;
+
+
+CREATE TABLE swoop.payload_cache (
+  payload_uuid uuid PRIMARY KEY CHECK (uuid_version(payload_uuid) = 5),
+  workflow_name text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  invalid_after timestamptz
+);
 
 
 CREATE TABLE swoop.action (
@@ -506,9 +521,10 @@ BEGIN
 END;
 $$;
 
+
 CREATE FUNCTION swoop.find_cached_action_for_payload(
-  plhash bytea,
-  wf_version smallint
+  _payload_uuid uuid,
+  _wf_version smallint
 )
 RETURNS uuid
 LANGUAGE plpgsql VOLATILE
@@ -526,14 +542,14 @@ BEGIN
   USING (payload_uuid)
   INNER JOIN swoop.thread t
   USING (action_uuid)
-  WHERE p.payload_hash = plhash
+  WHERE p.payload_uuid = _payload_uuid
   ORDER BY t.created_at DESC
   LIMIT 1;
 
   IF v_status IN ('RUNNING', 'PENDING', 'QUEUED', 'BACKOFF') THEN
   -- Redirect to job details for that workflow, and do not process
     RETURN v_action_id;
-  ELSIF wf_version > n_version THEN
+  ELSIF _wf_version > n_version THEN
     RETURN null;
   ELSIF d_invalid IS NOT NULL and d_invalid < now() THEN
     RETURN null;

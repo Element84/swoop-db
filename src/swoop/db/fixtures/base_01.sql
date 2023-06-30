@@ -1,12 +1,10 @@
 -- payloads
 INSERT INTO swoop.payload_cache (
   payload_uuid,
-  payload_hash,
   workflow_name,
   created_at
 ) VALUES (
-  'ade69fe7-1d7d-472e-9f36-7242cc2aca77',
-  decode('PsqWxdKjAjrV1+BueXnAS1cWIhU=', 'base64'),
+  'ade69fe7-1d7d-572e-9f36-7242cc2aca77',
   'some_workflow',
   '2023-04-28 15:49:00+00'
 );
@@ -31,7 +29,7 @@ INSERT INTO swoop.action (
   null,
   '2023-04-28 15:49:00+00',
   100,
-  'ade69fe7-1d7d-472e-9f36-7242cc2aca77',
+  'ade69fe7-1d7d-572e-9f36-7242cc2aca77',
   1,
   'argo-workflow'
 );
@@ -54,7 +52,7 @@ INSERT INTO swoop.action (
   null,
   '2023-04-28 15:49:00+00',
   100,
-  'ade69fe7-1d7d-472e-9f36-7242cc2aca77',
+  'ade69fe7-1d7d-572e-9f36-7242cc2aca77',
   1,
   'cirrus-workflow'
 );

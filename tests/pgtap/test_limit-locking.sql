@@ -5,13 +5,11 @@ SELECT plan(3);
 
 INSERT INTO swoop.payload_cache (
   payload_uuid,
-  payload_hash,
   workflow_name,
   created_at,
   invalid_after
 ) VALUES (
-  'cdc73916-500c-4501-a658-dd706a943d19'::uuid,
-  decode('123\000456', 'escape'),
+  'cdc73916-500c-5501-a658-dd706a943d19'::uuid,
   'workflow-a',
   '2023-04-14 00:25:07.388012+00'::timestamptz,
   '2023-04-20 00:25:07.388012+00'::timestamptz
@@ -33,7 +31,7 @@ BEGIN
       'argo-handler',
       'argo-workflow',
       'workflow-a',
-      'cdc73916-500c-4501-a658-dd706a943d19'::uuid,
+      'cdc73916-500c-5501-a658-dd706a943d19'::uuid,
       1
     );
   END LOOP;
