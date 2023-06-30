@@ -25,6 +25,7 @@ BEGIN
       action_uuid,
       action_type,
       handler_name,
+      handler_type,
       action_name,
       created_at,
       payload_uuid,
@@ -32,6 +33,7 @@ BEGIN
     ) VALUES (
       gen_random_uuid(),
       'workflow',
+      'argo-handler',
       'argo-workflow',
       'workflow-a',
       now(),

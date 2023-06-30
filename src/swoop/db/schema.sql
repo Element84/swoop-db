@@ -50,6 +50,7 @@ CREATE TABLE swoop.action (
   priority smallint DEFAULT 100,
   payload_uuid uuid REFERENCES swoop.payload_cache ON DELETE RESTRICT,
   workflow_version smallint NOT NULL,
+  handler_type text NOT NULL,
 
   CONSTRAINT workflow_or_callback CHECK (
     CASE
@@ -60,6 +61,7 @@ CREATE TABLE swoop.action (
       WHEN action_type = 'workflow' THEN
         action_name IS NOT NULL
         AND payload_uuid IS NOT NULL
+        AND parent_uuid IS NULL
     END
   )
 ) PARTITION BY RANGE (created_at);
@@ -111,7 +113,9 @@ CREATE TABLE swoop.thread ( -- noqa
     MINVALUE -2147483648
     START WITH 1
     CYCLE
-  )
+  ),
+  started_at timestamptz
+
 ) PARTITION BY RANGE (created_at);
 
 CREATE INDEX ON swoop.thread (created_at);
@@ -154,22 +158,6 @@ SELECT partman.create_parent(
   'monthly',
   p_template_table => 'swoop.event_template'
 );
-
-
-CREATE TABLE swoop.input_item (
-  item_uuid uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  item_id text NOT NULL,
-  collection text,
-  UNIQUE NULLS NOT DISTINCT (item_id, collection)
-);
-
-CREATE TABLE swoop.item_payload (
-  item_uuid uuid REFERENCES swoop.input_item ON DELETE RESTRICT,
-  payload_uuid uuid REFERENCES swoop.payload_cache ON DELETE CASCADE,
-  PRIMARY KEY (item_uuid, payload_uuid)
-);
-
-CREATE INDEX ON swoop.item_payload (item_uuid);
 
 
 CREATE FUNCTION swoop.add_pending_event()
@@ -226,13 +214,18 @@ AS $$
 DECLARE
   _latest timestamptz;
   _next_attempt timestamptz;
+  _started timestamptz;
 BEGIN
-  SELECT last_update FROM swoop.thread WHERE action_uuid = NEW.action_uuid INTO _latest;
+  SELECT last_update, started_at FROM swoop.thread WHERE action_uuid = NEW.action_uuid
+    INTO _latest, _started;
 
   -- If the event time is older than the last update we don't update the thread
   -- (we can't use a trigger condition to filter this because we don't know the
   -- last update time from the event alone).
   IF _latest IS NOT NULL AND NEW.event_time < _latest THEN
+    IF NEW.status = 'RUNNING' THEN
+        UPDATE swoop.thread as t SET started_at = NEW.event_time WHERE t.action_uuid = NEW.action_uuid;
+    END IF;
     RETURN NULL;
   END IF;
 
@@ -241,11 +234,16 @@ BEGIN
     SELECT NEW.event_time + (NEW.retry_seconds * interval '1 second') INTO _next_attempt;
   END IF;
 
+  IF _started IS NULL AND NEW.status = 'RUNNING' THEN
+    SELECT  NEW.event_time INTO _started;
+  END IF;
+
   UPDATE swoop.thread as t SET
     last_update = NEW.event_time,
     status = NEW.status,
     next_attempt_after = _next_attempt,
-    error = NEW.error
+    error = NEW.error,
+    started_at = _started
   WHERE
     t.action_uuid = NEW.action_uuid;
 
@@ -427,7 +425,10 @@ BEGIN
 END;
 $$;
 
-CREATE FUNCTION swoop.find_cached_action_for_payload(plhash bytea, wf_version smallint)
+CREATE FUNCTION swoop.find_cached_action_for_payload(
+  plhash bytea,
+  wf_version smallint
+)
 RETURNS uuid
 LANGUAGE plpgsql VOLATILE
 AS $$

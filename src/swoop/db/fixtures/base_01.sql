@@ -1,25 +1,3 @@
--- items
-INSERT INTO swoop.input_item (item_uuid, item_id, collection) VALUES (
-  'f5db7f4d-7a72-441c-a9e5-ec2d88c66f5c',
-  'id1',
-  'collection1'
-);
-INSERT INTO swoop.input_item (item_uuid, item_id, collection) VALUES (
-  'a9b95ee3-3fee-4e02-8565-8137b2d036ed',
-  'id2',
-  'collection1'
-);
-INSERT INTO swoop.input_item (item_uuid, item_id, collection) VALUES (
-  '01887754-5a7c-430f-abc7-3b4ac0b1281d',
-  'id3',
-  NULL
-);
-INSERT INTO swoop.input_item (item_uuid, item_id, collection) VALUES (
-  'dc87a668-66ae-4ac6-86f1-afc8e467d9e7',
-  'id4',
-  NULL
-);
-
 -- payloads
 INSERT INTO swoop.payload_cache (
   payload_uuid,
@@ -33,16 +11,6 @@ INSERT INTO swoop.payload_cache (
   '2023-04-28 15:49:00+00'
 );
 
--- item - payload relations
-INSERT INTO swoop.item_payload (item_uuid, payload_uuid) VALUES (
-  'f5db7f4d-7a72-441c-a9e5-ec2d88c66f5c',
-  'ade69fe7-1d7d-472e-9f36-7242cc2aca77'
-);
-INSERT INTO swoop.item_payload (item_uuid, payload_uuid) VALUES (
-  '01887754-5a7c-430f-abc7-3b4ac0b1281d',
-  'ade69fe7-1d7d-472e-9f36-7242cc2aca77'
-);
-
 -- actions
 INSERT INTO swoop.action (
   action_uuid,
@@ -53,17 +21,19 @@ INSERT INTO swoop.action (
   created_at,
   priority,
   payload_uuid,
-  workflow_version
+  workflow_version,
+  handler_type
 ) VALUES (
   '2595f2da-81a6-423c-84db-935e6791046e',
   'workflow',
   'action_1',
   'handler_foo',
-  'cf8ff7f0-ce5d-4de6-8026-4e551787385f',
+  null,
   '2023-04-28 15:49:00+00',
   100,
   'ade69fe7-1d7d-472e-9f36-7242cc2aca77',
-  1
+  1,
+  'argo-workflow'
 );
 INSERT INTO swoop.action (
   action_uuid,
@@ -74,17 +44,19 @@ INSERT INTO swoop.action (
   created_at,
   priority,
   payload_uuid,
-  workflow_version
+  workflow_version,
+  handler_type
 ) VALUES (
   '81842304-0aa9-4609-89f0-1c86819b0752',
   'workflow',
   'action_2',
   'handler_foo',
-  '2595f2da-81a6-423c-84db-935e6791046e',
+  null,
   '2023-04-28 15:49:00+00',
   100,
   'ade69fe7-1d7d-472e-9f36-7242cc2aca77',
-  1
+  1,
+  'cirrus-workflow'
 );
 
 -- threads

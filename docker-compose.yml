@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    build:
-      dockerfile: Dockerfile
+    build: .
     restart: always
     environment:
       POSTGRES_PASSWORD: "${PGPASSWORD:-password}"

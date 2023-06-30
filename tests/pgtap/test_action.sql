@@ -1,6 +1,6 @@
 BEGIN;
 SET search_path = tap, public;
-SELECT plan(13);
+SELECT plan(14);
 
 INSERT INTO swoop.payload_cache (
   payload_uuid,
@@ -20,6 +20,7 @@ INSERT INTO swoop.action (
   action_uuid,
   action_type,
   handler_name,
+  handler_type,
   action_name,
   created_at,
   payload_uuid,
@@ -27,6 +28,7 @@ INSERT INTO swoop.action (
 ) VALUES (
   'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
   'workflow',
+  'argo-handler',
   'argo-workflow',
   'workflow-a',
   '2023-04-13 00:25:07.388012+00'::timestamptz,
@@ -66,7 +68,8 @@ SELECT results_eq(
       last_update,
       action_uuid,
       status,
-      next_attempt_after
+      next_attempt_after,
+      started_at
     FROM
       swoop.thread
     WHERE
@@ -77,6 +80,7 @@ SELECT results_eq(
       '2023-04-13 00:25:07.388012+00'::timestamptz,
       'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
       'PENDING',
+      null::timestamptz,
       null::timestamptz
     )
   $$,
@@ -111,7 +115,7 @@ SELECT results_eq(
     FROM
       swoop.get_processable_actions(
         _ignored_action_uuids => array[]::uuid[],
-        _handler_names => array['argo-workflow']
+        _handler_names => array['argo-handler']
       )
   $$,
   $$
@@ -212,7 +216,7 @@ SELECT results_eq(
     FROM
       swoop.get_processable_actions(
         _ignored_action_uuids => array[]::uuid[],
-        _handler_names => array['argo-workflow']
+        _handler_names => array['argo-handler']
       )
   $$,
   $$
@@ -252,6 +256,37 @@ SELECT is_empty(
   'should not return any processable actions due to state'
 );
 
+-- insert running event, and check thread started_at and retry_seconds
+INSERT INTO swoop.event (
+  event_time,
+  action_uuid,
+  status,
+  retry_seconds
+) VALUES (
+  '2023-04-13 00:25:13.388012+00'::timestamptz,
+  'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
+  'RUNNING',
+  3::int
+);
+
+SELECT results_eq(
+  $$
+    SELECT
+      started_at,
+      next_attempt_after
+    FROM
+      swoop.thread
+    WHERE
+      action_uuid = 'b15120b8-b7ab-4180-9b7a-b0384758f468'
+  $$,
+  $$
+    VALUES (
+      '2023-04-13 00:25:13.388012+00'::timestamptz,
+      '2023-04-13 00:25:16.388012+00'::timestamptz
+    )
+  $$,
+  'started_at should be same as last_update for RUNNING events'
+);
 
 SELECT * FROM finish(); -- noqa
 ROLLBACK;

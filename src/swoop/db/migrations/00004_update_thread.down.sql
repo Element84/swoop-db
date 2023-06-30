@@ -1,5 +1,8 @@
-DELETE FROM swoop.event_state WHERE name = 'UNKNOWN';
+ALTER TABLE swoop.thread
+DROP COLUMN started_at;
 
+ALTER TABLE swoop.thread_template
+DROP COLUMN started_at;
 
 CREATE OR REPLACE FUNCTION swoop.update_thread()
 RETURNS trigger
@@ -38,48 +41,5 @@ BEGIN
   -- to stay aware of that possibility.
 
   RETURN NULL;
-END;
-$$;
-
-
--- Update check_cache function
-
-DROP FUNCTION IF EXISTS swoop.check_cache;
-
-CREATE FUNCTION swoop.find_cached_action_for_payload(
-  plhash bytea, wf_version smallint
-)
-RETURNS uuid
-LANGUAGE plpgsql VOLATILE
-AS $$
-DECLARE
-  v_status text;
-  n_version smallint;
-  d_invalid timestamptz;
-  v_action_id uuid;
-BEGIN
-  SELECT t.status, a.workflow_version, p.invalid_after, a.action_uuid
-  INTO v_status, n_version, d_invalid, v_action_id
-  FROM swoop.payload_cache p
-  INNER JOIN swoop.action a
-  USING (payload_uuid)
-  INNER JOIN swoop.thread t
-  USING (action_uuid)
-  WHERE p.payload_hash = plhash
-  ORDER BY t.created_at DESC
-  LIMIT 1;
-
-  IF v_status IN ('RUNNING', 'PENDING', 'QUEUED', 'BACKOFF') THEN
-  -- Redirect to job details for that workflow, and do not process
-    RETURN v_action_id;
-  ELSIF wf_version > n_version THEN
-    RETURN null;
-  ELSIF d_invalid IS NOT NULL and d_invalid < now() THEN
-    RETURN null;
-  ELSIF v_status IN ('SUCCESSFUL', 'INVALID') THEN
-    RETURN v_action_id;
-  ELSE
-    RETURN null;
-  END IF;
 END;
 $$;
