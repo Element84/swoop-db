@@ -4,13 +4,11 @@ SELECT plan(16);
 
 INSERT INTO swoop.payload_cache (
   payload_uuid,
-  payload_hash,
   workflow_name,
   created_at,
   invalid_after
 ) VALUES (
-  'cdc73916-500c-4501-a658-dd706a943d19'::uuid,
-  decode('123\000456', 'escape'),
+  'cdc73916-500c-5501-a658-dd706a943d19'::uuid,
   'workflow-a',
   '2023-04-14 00:25:07.388012+00'::timestamptz,
   '2023-04-20 00:25:07.388012+00'::timestamptz
@@ -32,7 +30,7 @@ INSERT INTO swoop.action (
   'argo-workflow',
   'workflow-a',
   '2023-04-13 00:25:07.388012+00'::timestamptz,
-  'cdc73916-500c-4501-a658-dd706a943d19'::uuid,
+  'cdc73916-500c-5501-a658-dd706a943d19'::uuid,
   1
 );
 
@@ -305,7 +303,7 @@ PREPARE bad_uuid AS INSERT INTO swoop.action ( -- noqa: PRS
   'argo-workflow',
   'workflow-a',
   '2023-04-13 00:25:07.388012+00'::timestamptz,
-  'cdc73916-500c-4501-a658-dd706a943d19'::uuid,
+  'cdc73916-500c-5501-a658-dd706a943d19'::uuid,
   1
 );
 SELECT throws_ok(
@@ -332,7 +330,7 @@ PREPARE mismatched_timestamps AS INSERT INTO swoop.action ( -- noqa: PRS
   'argo-workflow',
   'workflow-a',
   '1567-04-13 00:25:07.388012+00'::timestamptz,
-  'cdc73916-500c-4501-a658-dd706a943d19'::uuid,
+  'cdc73916-500c-5501-a658-dd706a943d19'::uuid,
   1
 );
 SELECT throws_ok(
