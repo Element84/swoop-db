@@ -1,6 +1,6 @@
 BEGIN;
 SET search_path = tap, public;
-SELECT plan(14);
+SELECT plan(16);
 
 INSERT INTO swoop.payload_cache (
   payload_uuid,
@@ -287,6 +287,63 @@ SELECT results_eq(
   $$,
   'started_at should be same as last_update for RUNNING events'
 );
+
+
+PREPARE bad_uuid AS INSERT INTO swoop.action ( -- noqa: PRS
+  action_uuid,
+  action_type,
+  handler_name,
+  handler_type,
+  action_name,
+  created_at,
+  payload_uuid,
+  workflow_version
+) VALUES (
+  gen_random_uuid(),
+  'workflow',
+  'argo-handler',
+  'argo-workflow',
+  'workflow-a',
+  '2023-04-13 00:25:07.388012+00'::timestamptz,
+  'cdc73916-500c-4501-a658-dd706a943d19'::uuid,
+  1
+);
+SELECT throws_ok(
+  'bad_uuid',
+  'P0001',
+  'UUID must be version 7, not 4',
+  'table constraint should not allow uuid v4 action_uuid'
+);
+
+
+PREPARE mismatched_timestamps AS INSERT INTO swoop.action ( -- noqa: PRS
+  action_uuid,
+  action_type,
+  handler_name,
+  handler_type,
+  action_name,
+  created_at,
+  payload_uuid,
+  workflow_version
+) VALUES (
+  '01877800-703c-7165-8020-322798184193'::uuid,
+  'workflow',
+  'argo-handler',
+  'argo-workflow',
+  'workflow-a',
+  '1567-04-13 00:25:07.388012+00'::timestamptz,
+  'cdc73916-500c-4501-a658-dd706a943d19'::uuid,
+  1
+);
+SELECT throws_ok(
+  'mismatched_timestamps',
+  '23514',
+  'new row for relation "action_default" violates '
+  || 'check constraint "uuid_timestamp_matches_created_at"',
+  'table constraint should not allow difference '
+  || 'between action_uuid and created_at timestamps'
+);
+
 
 SELECT * FROM finish(); -- noqa
 ROLLBACK;
