@@ -1,3 +1,5 @@
+UPDATE swoop.action SET parent_uuid = NULL where action_type = 'workflow';
+
 ALTER TABLE swoop.action
   DROP CONSTRAINT workflow_or_callback
 , ADD CONSTRAINT workflow_or_callback CHECK (

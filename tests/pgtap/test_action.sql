@@ -1,6 +1,6 @@
 BEGIN;
 SET search_path = tap, public;
-SELECT plan(13);
+SELECT plan(14);
 
 INSERT INTO swoop.payload_cache (
   payload_uuid,
@@ -256,6 +256,37 @@ SELECT is_empty(
   'should not return any processable actions due to state'
 );
 
+-- insert running event, and check thread started_at and retry_seconds
+INSERT INTO swoop.event (
+  event_time,
+  action_uuid,
+  status,
+  retry_seconds
+) VALUES (
+  '2023-04-13 00:25:13.388012+00'::timestamptz,
+  'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
+  'RUNNING',
+  3::int
+);
+
+SELECT results_eq(
+  $$
+    SELECT
+      started_at,
+      next_attempt_after
+    FROM
+      swoop.thread
+    WHERE
+      action_uuid = 'b15120b8-b7ab-4180-9b7a-b0384758f468'
+  $$,
+  $$
+    VALUES (
+      '2023-04-13 00:25:13.388012+00'::timestamptz,
+      '2023-04-13 00:25:16.388012+00'::timestamptz
+    )
+  $$,
+  'started_at should be same as last_update for RUNNING events'
+);
 
 SELECT * FROM finish(); -- noqa
 ROLLBACK;

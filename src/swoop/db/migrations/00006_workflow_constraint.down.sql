@@ -10,4 +10,5 @@ ALTER TABLE swoop.action
         action_name IS NOT NULL
         AND payload_uuid IS NOT NULL
     END
-  )
+  );
+
