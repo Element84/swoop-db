@@ -24,7 +24,7 @@ INSERT INTO swoop.action (
   workflow_version,
   handler_type
 ) VALUES (
-  '2595f2da-81a6-423c-84db-935e6791046e',
+  '0187c88d-a9e0-788c-adcb-c0b951f8be91',
   'workflow',
   'action_1',
   'handler_foo',
@@ -47,7 +47,7 @@ INSERT INTO swoop.action (
   workflow_version,
   handler_type
 ) VALUES (
-  '81842304-0aa9-4609-89f0-1c86819b0752',
+  '0187c88d-a9e0-757e-aa36-2fbb6c834cb5',
   'workflow',
   'action_2',
   'handler_foo',
@@ -66,19 +66,19 @@ INSERT INTO swoop.action (
 --     PENDING events created by action insert trigger
 INSERT INTO swoop.event (event_time, action_uuid, status, event_source) VALUES (
   '2023-04-28 15:49:01+00',
-  '2595f2da-81a6-423c-84db-935e6791046e',
+  '0187c88d-a9e0-788c-adcb-c0b951f8be91',
   'QUEUED',
   'swoop-db'
 );
 INSERT INTO swoop.event (event_time, action_uuid, status, event_source) VALUES (
   '2023-04-28 15:49:02+00',
-  '2595f2da-81a6-423c-84db-935e6791046e',
+  '0187c88d-a9e0-788c-adcb-c0b951f8be91',
   'RUNNING',
   'swoop-db'
 );
 INSERT INTO swoop.event (event_time, action_uuid, status, event_source) VALUES (
   '2023-04-28 15:49:03+00',
-  '2595f2da-81a6-423c-84db-935e6791046e',
+  '0187c88d-a9e0-788c-adcb-c0b951f8be91',
   'SUCCESSFUL',
   'swoop-db'
 );
