@@ -18,7 +18,7 @@ SELECT is(
   'should be able to reverse the uuid back into the input timestamp'
 );
 
-PREPARE thrower AS SELECT timestamp_from_uuid_v7(gen_random_uuid());
+PREPARE thrower AS SELECT timestamp_from_uuid_v7(gen_random_uuid()); -- noqa: PRS
 SELECT throws_ok(
   'thrower',
   'P0001',
