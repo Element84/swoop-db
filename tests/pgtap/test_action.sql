@@ -26,7 +26,7 @@ INSERT INTO swoop.action (
   payload_uuid,
   workflow_version
 ) VALUES (
-  'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
+  '01877800-703c-7165-8020-322798184193'::uuid,
   'workflow',
   'argo-handler',
   'argo-workflow',
@@ -47,12 +47,12 @@ SELECT results_eq(
       error
     FROM
       swoop.event
-    WHERE action_uuid = 'b15120b8-b7ab-4180-9b7a-b0384758f468'
+    WHERE action_uuid = '01877800-703c-7165-8020-322798184193'
   $$,
   $$
     VALUES (
       '2023-04-13 00:25:07.388012+00'::timestamptz,
-      'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
+      '01877800-703c-7165-8020-322798184193'::uuid,
       'PENDING',
       null::integer,
       null
@@ -73,12 +73,12 @@ SELECT results_eq(
     FROM
       swoop.thread
     WHERE
-      action_uuid = 'b15120b8-b7ab-4180-9b7a-b0384758f468'
+      action_uuid = '01877800-703c-7165-8020-322798184193'
   $$,
   $$
     VALUES (
       '2023-04-13 00:25:07.388012+00'::timestamptz,
-      'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
+      '01877800-703c-7165-8020-322798184193'::uuid,
       'PENDING',
       null::timestamptz,
       null::timestamptz
@@ -101,7 +101,7 @@ SELECT is_empty(
 SELECT is_empty(
   $$
     SELECT swoop.get_processable_actions(
-      _ignored_action_uuids => array['b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid]
+      _ignored_action_uuids => array['01877800-703c-7165-8020-322798184193'::uuid]
     )
   $$,
   'should not return any processable actions - filtered action uuid'
@@ -125,7 +125,7 @@ SELECT results_eq(
     FROM
       swoop.action
     WHERE
-      action_uuid = 'b15120b8-b7ab-4180-9b7a-b0384758f468'
+      action_uuid = '01877800-703c-7165-8020-322798184193'
   $$,
   'should get our processable action'
 );
@@ -148,7 +148,7 @@ SELECT results_eq(
     FROM
       swoop.thread
     WHERE
-      action_uuid = 'b15120b8-b7ab-4180-9b7a-b0384758f468'
+      action_uuid = '01877800-703c-7165-8020-322798184193'
   $$,
   'should have an advisory lock for the processable action we grabbed'
 );
@@ -163,7 +163,7 @@ INSERT INTO swoop.event (
   error
 ) VALUES (
   '2023-04-13 00:25:08.388012+00'::timestamptz,
-  'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
+  '01877800-703c-7165-8020-322798184193'::uuid,
   'BACKOFF',
   1,
   'some error string'
@@ -176,7 +176,7 @@ SELECT
   )
 FROM swoop.thread
 WHERE
-  action_uuid = 'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid;
+  action_uuid = '01877800-703c-7165-8020-322798184193'::uuid;
 
 SELECT is_empty(
   $$
@@ -233,7 +233,7 @@ INSERT INTO swoop.event (
   status
 ) VALUES (
   '2023-04-13 00:25:10.388012+00'::timestamptz,
-  'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
+  '01877800-703c-7165-8020-322798184193'::uuid,
   'QUEUED'
 );
 
@@ -244,7 +244,7 @@ SELECT
   )
 FROM swoop.thread
 WHERE
-  action_uuid = 'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid;
+  action_uuid = '01877800-703c-7165-8020-322798184193'::uuid;
 
 
 SELECT is_empty(
@@ -264,7 +264,7 @@ INSERT INTO swoop.event (
   retry_seconds
 ) VALUES (
   '2023-04-13 00:25:13.388012+00'::timestamptz,
-  'b15120b8-b7ab-4180-9b7a-b0384758f468'::uuid,
+  '01877800-703c-7165-8020-322798184193'::uuid,
   'RUNNING',
   3::int
 );
@@ -277,7 +277,7 @@ SELECT results_eq(
     FROM
       swoop.thread
     WHERE
-      action_uuid = 'b15120b8-b7ab-4180-9b7a-b0384758f468'
+      action_uuid = '01877800-703c-7165-8020-322798184193'
   $$,
   $$
     VALUES (

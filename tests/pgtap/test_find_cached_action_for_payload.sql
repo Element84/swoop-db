@@ -81,7 +81,7 @@ INSERT INTO swoop.action (
   payload_uuid,
   workflow_version
 ) VALUES (
-  '2595f2da-81a6-423c-84db-935e6791046e',
+  '0187c88d-a9e0-757e-aa36-2fbb6c834cb5',
   'workflow',
   'action_1',
   'handler_foo',
@@ -106,7 +106,7 @@ INSERT INTO swoop.action (
   workflow_version
 )
 VALUES (
-  '71ba4b00-245e-4189-9ee8-0016a3ac274d',
+  '0187c893-2820-77b1-a7b2-f29206b702ae',
   'workflow',
   'action_2',
   'handler_foo',
@@ -130,7 +130,7 @@ INSERT INTO swoop.action (
   payload_uuid,
   workflow_version
 ) VALUES (
-  '81842304-0aa9-4609-89f0-1c86819b0752',
+  '0187c895-e740-7a17-9757-1d82de96c033',
   'workflow',
   'action_3',
   'handler_foo',
@@ -154,7 +154,7 @@ INSERT INTO swoop.action (
   payload_uuid,
   workflow_version
 ) VALUES (
-  '7716319b-5064-41fc-be04-0e1330c0c290',
+  '0187d2e2-9f40-7824-9392-fc2c6abc799a',
   'workflow',
   'action_1',
   'handler_foo',
@@ -168,7 +168,7 @@ INSERT INTO swoop.action (
 
 
 DELETE FROM swoop.thread
-WHERE action_uuid = '7716319b-5064-41fc-be04-0e1330c0c290';
+WHERE action_uuid = '0187d2e2-9f40-7824-9392-fc2c6abc799a';
 
 
 SELECT results_eq(
@@ -196,7 +196,7 @@ INSERT INTO swoop.thread (
 ) VALUES (
   '2023-04-28 15:49:00+00',
   '2023-04-28 15:49:00+00',
-  '2595f2da-81a6-423c-84db-935e6791046e',
+  '0187c88d-a9e0-757e-aa36-2fbb6c834cb5',
   'handler_foo',
   100,
   'PENDING',
@@ -216,7 +216,7 @@ INSERT INTO swoop.thread (
 ) VALUES (
   '2023-04-28 15:55:00+00',
   '2023-04-28 15:55:00+00',
-  '71ba4b00-245e-4189-9ee8-0016a3ac274d',
+  '0187c893-2820-77b1-a7b2-f29206b702ae',
   'handler_foo',
   100,
   'PENDING',
@@ -236,7 +236,7 @@ INSERT INTO swoop.thread (
 ) VALUES (
   '2023-04-28 15:58:00+00',
   '2023-04-28 15:58:00+00',
-  '81842304-0aa9-4609-89f0-1c86819b0752',
+  '0187c895-e740-7a17-9757-1d82de96c033',
   'handler_foo',
   100,
   'SUCCESSFUL',
@@ -256,7 +256,7 @@ INSERT INTO swoop.thread (
 ) VALUES (
   '2023-04-30 15:58:00+00',
   '2023-04-30 15:58:00+00',
-  '7716319b-5064-41fc-be04-0e1330c0c290',
+  '0187d2e2-9f40-7824-9392-fc2c6abc799a',
   'handler_foo',
   100,
   'PENDING',
@@ -271,7 +271,7 @@ SELECT results_eq(
   $$,
   $$
     VALUES (
-      '81842304-0aa9-4609-89f0-1c86819b0752'::uuid
+      '0187c895-e740-7a17-9757-1d82de96c033'::uuid
     )
   $$,
   'return action_uuid when cache, action, thread entries exist and PENDING.'
@@ -284,7 +284,7 @@ SELECT results_eq(
   $$,
   $$
     VALUES (
-      '81842304-0aa9-4609-89f0-1c86819b0752'::uuid
+      '0187c895-e740-7a17-9757-1d82de96c033'::uuid
     )
   $$,
   'return action_uuid when cache, action, thread entries exist and SUCCESSFUL.'
@@ -312,7 +312,7 @@ associated with that payload_uuid to a FAILED state
 UPDATE swoop.payload_cache SET invalid_after = '2000-01-01 00:00:00+00'
 WHERE payload_uuid = 'e8d87aa6-6c42-47ed-a33c-94498fb2c20e';
 UPDATE swoop.thread SET status = 'FAILED'
-WHERE action_uuid = '81842304-0aa9-4609-89f0-1c86819b0752';
+WHERE action_uuid = '0187c895-e740-7a17-9757-1d82de96c033';
 
 SELECT results_eq(
   $$

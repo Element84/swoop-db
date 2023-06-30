@@ -22,21 +22,17 @@ $$
 BEGIN
   FOR i in 1..300 LOOP
     INSERT INTO swoop.action (
-      action_uuid,
       action_type,
       handler_name,
       handler_type,
       action_name,
-      created_at,
       payload_uuid,
       workflow_version
     ) VALUES (
-      gen_random_uuid(),
       'workflow',
       'argo-handler',
       'argo-workflow',
       'workflow-a',
-      now(),
       'cdc73916-500c-4501-a658-dd706a943d19'::uuid,
       1
     );
