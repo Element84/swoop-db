@@ -8,7 +8,7 @@ RUN ./swoop-db-venv/bin/pip install -r requirements.txt
 RUN --mount=source=.git,target=.git,type=bind git clone . clone
 RUN ./swoop-db-venv/bin/pip install ./clone
 
-FROM postgres:15-bullseye
+FROM postgres:15
 # install build deps and pg_partman
 RUN set -x && \
     apt-get update && \

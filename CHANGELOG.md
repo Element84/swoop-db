@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [v7.0.1] - 2023-07-11
+
+### Changed
+
+- Use the same image version for all build stages in the Dockerfile (fixes an
+  issue with libc not found) ([#21])
+
 ## [v7.0.0] - 2023-07-01
 
 ### ⚠️ Breaking Changes
@@ -64,6 +71,8 @@ schema.
 Initial release
 
 [unreleased]: https://github.com/element84/swoop-db/compare/v7.0.0...main
+[unreleased]: https://github.com/element84/swoop-db/compare/v7.0.1...main
+[v7.0.1]: https://github.com/element84/swoop-db/compare/v7.0.0...7.0.1
 [v7.0.0]: https://github.com/element84/swoop-db/compare/v2.0.0...7.0.0
 [v2.0.0]: https://github.com/element84/swoop-db/compare/v0.1.0...2.0.0
 [v0.1.0]: https://github.com/element84/swoop-db/tree/v0.1.0
@@ -73,5 +82,6 @@ Initial release
 [#15]: https://github.com/Element84/swoop-db/pull/15
 [#19]: https://github.com/Element84/swoop-db/pull/19
 [#20]: https://github.com/Element84/swoop-db/pull/20
+[#21]: https://github.com/Element84/swoop-db/pull/21
 
 [dbami]: https://github.com/element84/dbami
