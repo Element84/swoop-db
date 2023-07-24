@@ -23,7 +23,7 @@ RUN set -x && \
     trap "rm -rf '$tmp'" EXIT && \
     cd "$tmp" && \
     curl -fsSL https://github.com/theory/pgtap/archive/refs/tags/v${PGTAP_VERSION}.tar.gz \
-        -o pgtap.tar.gz && \
+    -o pgtap.tar.gz && \
     tar -xzf pgtap.tar.gz --strip-components 1 && \
     make install
 
@@ -33,3 +33,5 @@ ENV PGUSER: "${PGUSER:-postgres}"
 # copy the python venv into this output image and add it's bin to the path
 COPY --from=APP /opt/swoop/db/swoop-db-venv /opt/swoop/db/swoop-db-venv
 ENV PATH=/opt/swoop/db/swoop-db-venv/bin:$PATH
+
+COPY bin/db-initialization.py home/db-initialization.py
