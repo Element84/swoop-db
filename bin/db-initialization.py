@@ -3,7 +3,7 @@ import os
 
 from buildpg import V, asyncpg, render
 
-DB_NAME = "test"
+DB_NAME = os.environ["DATABASE_TO_CREATE"]
 
 
 def db_initialization():
