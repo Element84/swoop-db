@@ -1,13 +1,14 @@
 import asyncio
 import os
-from buildpg import V, render, asyncpg
+
+from buildpg import V, asyncpg, render
 
 DB_NAME = "test"
 
 
 def db_initialization():
     async def setup():
-        dsn = f"postgresql://postgres:password@postgres:5432/postgres"
+        dsn = "postgresql://postgres:password@postgres:5432/postgres"
         conn = await asyncpg.connect(dsn=dsn)
 
         # Create Owner Role
