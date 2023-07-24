@@ -8,7 +8,9 @@ DB_NAME = "test"
 
 def db_initialization():
     async def setup():
-        dsn = "postgresql://postgres:password@postgres:5432/postgres"
+        user = os.environ["POSTGRES_DEFAULT_USERNAME"]
+        password = os.environ["POSTGRES_DEFAULT_PASSWORD"]
+        dsn = f"postgresql://{user}:{password}@postgres:5432/postgres"
         conn = await asyncpg.connect(dsn=dsn)
 
         # Create Owner Role
