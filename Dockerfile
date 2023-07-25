@@ -33,3 +33,7 @@ ENV PGUSER "${PGUSER:-postgres}"
 # copy the python venv into this output image and add it's bin to the path
 COPY --from=APP /opt/swoop/db/swoop-db-venv /opt/swoop/db/swoop-db-venv
 ENV PATH=/opt/swoop/db/swoop-db-venv/bin:$PATH
+
+RUN mkdir -p /opt/swoop/db/scripts
+COPY bin/db-initialization.py /opt/swoop/db/scripts/db-initialization.py
+ENV PATH=/opt/swoop/db/scripts:$PATH
