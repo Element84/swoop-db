@@ -22,10 +22,9 @@ import asyncio
 import os
 import sys
 
-from buildpg import V, render, funcs
+from buildpg import V, funcs, render
 
 from swoop.db import SwoopDB
-
 
 APPLICATION_ROLES = ["user_api", "user_caboose", "user_conductor"]
 
@@ -66,8 +65,8 @@ async def run_migrations() -> None:
         "--wait_override",
         action="store_true",
         default=False,
-        help="Override option to skip waiting for active connections to close. If specified,\
-        it is true, and if not specified it is false.",
+        help="Override option to skip waiting for active connections to close. \
+        If specified, it is true, and if not specified it is false.",
     )
 
     args = parser.parse_args()
@@ -78,16 +77,9 @@ async def run_migrations() -> None:
 
     swoop_db = SwoopDB()
 
-    if action == "migrate":
-        direction = "up"
-    elif action == "rollback":
-        direction = "down"
-    else:
-        direction = None
-
     if override:
         stderr(f"Applying migrate/rollback on database {dbname} to version {version}")
-        await swoop_db.migrate(target=version, direction=direction, database=dbname)
+        await swoop_db.migrate(target=version, database=dbname)
     else:
         async with swoop_db.get_db_connection(database="") as conn:
             # Wait for all active connections from user roles to be closed
@@ -110,9 +102,10 @@ async def run_migrations() -> None:
                 stderr(f"Rolling back database {dbname} to version {version}")
             else:
                 stderr(
-                    f"Applying migrate/rollback on database {dbname} to version {version}"
+                    f"Applying migrate/rollback on database {dbname} to \
+                    version {version}"
                 )
-            await swoop_db.migrate(target=version, direction=direction, database=dbname)
+            await swoop_db.migrate(target=version, database=dbname)
 
 
 if __name__ == "__main__":
