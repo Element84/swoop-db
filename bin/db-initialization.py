@@ -25,11 +25,11 @@ from buildpg import V, render
 from swoop.db import SwoopDB
 
 OWNER_ROLE_NAME = "swoop"
+OWNER_ROLE = "OWNER_ROLE"
 APPLICATION_ROLES: list[str] = [
     "API_ROLE",
     "CABOOSE_ROLE",
     "CONDUCTOR_ROLE",
-    "MIGRATION_ROLE",
 ]
 
 
@@ -40,8 +40,9 @@ def stderr(*args, **kwargs) -> None:
 
 async def create_owner_role(conn: asyncpg.Connection, owner_role_name: str) -> None:
     q, p = render(
-        "CREATE ROLE :un",
+        "CREATE ROLE :un WITH LOGIN PASSWORD ':pw'",
         un=V(owner_role_name),
+        pw=V(os.environ["OWNER_ROLE_PASS"]),
     )
     await conn.execute(q, *p)
 
@@ -73,28 +74,47 @@ async def create_database(
     await conn.execute(q, *p)
 
 
+async def post_create_init(conn: asyncpg.Connection, owner_role_name: str) -> None:
+    q, p = render(
+        """
+        CREATE SCHEMA IF NOT EXISTS partman AUTHORIZATION :dbo;
+        CREATE EXTENSION IF NOT EXISTS pg_partman SCHEMA partman;
+        GRANT ALL ON SCHEMA partman TO :dbo;
+        GRANT ALL ON ALL TABLES IN SCHEMA partman TO :dbo;
+        GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA partman TO :dbo;
+        GRANT EXECUTE ON ALL PROCEDURES IN SCHEMA partman TO :dbo;
+        """,
+        dbo=V(owner_role_name),
+    )
+    await conn.execute(q, *p)
+
+
 async def db_initialization() -> None:
     dbname: str = os.environ["PGDATABASE"]
+    owner: str = os.environ["OWNER_ROLE_USER"]
 
-    async with SwoopDB.get_db_connection(database="") as conn:
+    async with SwoopDB.get_db_connection(database="postgres") as conn:
         try:
-            stderr(f"Creating owner role '{OWNER_ROLE_NAME}'...")
-            await create_owner_role(conn, OWNER_ROLE_NAME)
+            stderr(f"Creating owner role '{owner}'...")
+            await create_owner_role(conn, owner)
         except asyncpg.DuplicateObjectError:
             stderr("Owner already exists, skipping.")
 
         for role in APPLICATION_ROLES:
             try:
                 stderr(f"Creating application role {role}...")
-                await create_application_role(conn, role, OWNER_ROLE_NAME)
+                await create_application_role(conn, role, owner)
             except asyncpg.DuplicateObjectError:
                 stderr("Role already exists, skipping.")
 
         try:
             stderr(f"Creating database '{dbname}'...")
-            await create_database(conn, dbname, OWNER_ROLE_NAME)
+            await create_database(conn, dbname, owner)
         except asyncpg.DuplicateDatabaseError:
             stderr("Database already exists, skipping.")
+
+    async with SwoopDB.get_db_connection() as conn:
+        await post_create_init(conn, owner)
 
 
 if __name__ == "__main__":
