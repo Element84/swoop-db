@@ -1,6 +1,6 @@
-CREATE SCHEMA swoop;
-CREATE SCHEMA partman;
-CREATE EXTENSION pg_partman SCHEMA partman;
+CREATE SCHEMA IF NOT EXISTS swoop;
+CREATE SCHEMA IF NOT EXISTS partman;
+CREATE EXTENSION IF NOT EXISTS pg_partman SCHEMA partman;
 
 
 CREATE TABLE swoop.event_state (
