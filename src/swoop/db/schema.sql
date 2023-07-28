@@ -86,7 +86,7 @@ $$;
 
 CREATE FUNCTION public.uuid_version(_uuid_bytes bytea)
 RETURNS integer
-LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 AS $$
   SELECT get_byte(_uuid_bytes, 6)::bit(8)::bit(4)::int;
 $$;
@@ -94,7 +94,7 @@ $$;
 
 CREATE FUNCTION public.uuid_version(_uuid uuid)
 RETURNS integer
-LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT
 AS $$
   SELECT uuid_version(uuid_send(_uuid));
 $$;
@@ -102,7 +102,7 @@ $$;
 
 CREATE FUNCTION public.timestamp_from_uuid_v7(_uuid uuid)
 RETURNS timestamptz
-LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE STRICT LEAKPROOF
+LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE STRICT
 AS $$
 DECLARE
   _uuid_version integer;
