@@ -23,7 +23,7 @@ RUN set -x && \
     trap "rm -rf '$tmp'" EXIT && \
     cd "$tmp" && \
     curl -fsSL https://github.com/theory/pgtap/archive/refs/tags/v${PGTAP_VERSION}.tar.gz \
-        -o pgtap.tar.gz && \
+    -o pgtap.tar.gz && \
     tar -xzf pgtap.tar.gz --strip-components 1 && \
     make install
 
@@ -36,4 +36,5 @@ ENV PATH=/opt/swoop/db/swoop-db-venv/bin:$PATH
 
 RUN mkdir -p /opt/swoop/db/scripts
 COPY bin/db-initialization.py /opt/swoop/db/scripts/db-initialization.py
+COPY bin/run-migration-job.py /opt/swoop/db/scripts/run-migration-job.py
 ENV PATH=/opt/swoop/db/scripts:$PATH
