@@ -23,7 +23,7 @@ RUN set -x && \
     trap "rm -rf '$tmp'" EXIT && \
     cd "$tmp" && \
     curl -fsSL https://github.com/theory/pgtap/archive/refs/tags/v${PGTAP_VERSION}.tar.gz \
-    -o pgtap.tar.gz && \
+        -o pgtap.tar.gz && \
     tar -xzf pgtap.tar.gz --strip-components 1 && \
     make install
 
