@@ -63,8 +63,7 @@ async def run_migrations() -> None:
 
     parser.add_argument(
         "--wait_override",
-        action="store_true",
-        default=False,
+        choices=["true", "false"],
         help="Override option to skip waiting for active connections to close. \
         If specified, it is true, and if not specified it is false.",
     )
@@ -77,7 +76,7 @@ async def run_migrations() -> None:
 
     swoop_db = SwoopDB()
 
-    if override:
+    if override == "true":
         stderr(f"Applying migrate/rollback on database {dbname} to version {version}")
         await swoop_db.migrate(target=version, database=dbname)
     else:
