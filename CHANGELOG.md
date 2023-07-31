@@ -1,4 +1,3 @@
-
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -7,6 +6,26 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [v8.0.0] - 2023-08-01
+
+### Added
+
+- Migration `00008_new_base` consolidates all prior migrations in a single
+  non-backward-compatible file. This fixes a problem applying `LEAKPROOF`
+  functions as a non-superuser. ([#25])
+
+### Changed
+
+- `/bin/db-initialization.py` script makes database owner a login role for use
+  running migration to fix ownership issues. ([#25])
+
+## [v7.0.3] - 2023-07-25
+
+### Added
+
+- `/bin/db-initialization.py` script as an example for how to create a new
+  swoop db with roles. ([#23])
 
 ## [v7.0.2] - 2023-07-12
 
@@ -76,7 +95,9 @@ schema.
 
 Initial release
 
-[unreleased]: https://github.com/element84/swoop-db/compare/v7.0.2...main
+[unreleased]: https://github.com/element84/swoop-db/compare/v8.0.0...main
+[v8.0.0]: https://github.com/element84/swoop-db/compare/v7.0.3...8.0.0
+[v7.0.3]: https://github.com/element84/swoop-db/compare/v7.0.2...7.0.3
 [v7.0.2]: https://github.com/element84/swoop-db/compare/v7.0.1...7.0.2
 [v7.0.1]: https://github.com/element84/swoop-db/compare/v7.0.0...7.0.1
 [v7.0.0]: https://github.com/element84/swoop-db/compare/v2.0.0...7.0.0
@@ -90,5 +111,7 @@ Initial release
 [#20]: https://github.com/Element84/swoop-db/pull/20
 [#21]: https://github.com/Element84/swoop-db/pull/21
 [#22]: https://github.com/Element84/swoop-db/pull/22
+[#23]: https://github.com/Element84/swoop-db/pull/23
+[#25]: https://github.com/Element84/swoop-db/pull/25
 
 [dbami]: https://github.com/element84/dbami
