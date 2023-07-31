@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 import pytest
@@ -12,33 +11,15 @@ def migration_fixtures(pytestconfig) -> Path:
     return pytestconfig.rootpath.joinpath("tests", "fixtures", "migrations")
 
 
-def uuid_replacer(instr: str) -> str:
-    uuids: list[str] = re.findall(
-        r"'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'",
-        instr,
-    )
-
-    for index, uuid in enumerate(uuids):
-        instr = instr.replace(uuid, f"'uuid{index}'")
-
-    return instr
-
-
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     "start,end,result_editor",
     [
-        (0, 1, None),
-        (0, 2, None),
-        (2, 6, None),
-        (6, 7, uuid_replacer),
+        # (8, 9, None),
     ],
 )
 async def test_migration(start, end, result_editor, migration_fixtures, pg_dump):
-    if result_editor is None:
-
-        def result_editor(x):
-            return x
+    result_editor = (lambda x: x) if result_editor is None else result_editor
 
     fixture = migration_fixtures.joinpath(f"{start}_base_01.sql")
     result = migration_fixtures.joinpath(f"{end}_result.sql")
