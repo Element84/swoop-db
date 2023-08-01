@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - `/bin/db-initialization.py` script makes database owner a login role for use
   running migration to fix ownership issues. ([#25])
+- Update [dbami] dependency to v0.3.0 ([#25])
+
 
 ## [v7.0.3] - 2023-07-25
 

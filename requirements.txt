@@ -10,5 +10,5 @@ asyncpg==0.27.0
     #   swoop.db (pyproject.toml)
 buildpg==0.4
     # via dbami
-dbami==0.2.0
+dbami==0.3.0
     # via swoop.db (pyproject.toml)
