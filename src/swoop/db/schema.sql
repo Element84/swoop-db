@@ -133,16 +133,16 @@ CREATE TABLE swoop.payload_cache (
 
 
 CREATE TABLE swoop.action (
-  action_uuid uuid NOT NULL DEFAULT gen_uuid_v7(now()),
-  action_type text NOT NULL CHECK (action_type IN ('callback', 'workflow')),
   action_name text,
-  handler_name text NOT NULL,
-  parent_uuid uuid, -- reference omitted, we don't need referential integrity
+  action_type text NOT NULL CHECK (action_type IN ('callback', 'workflow')),
+  action_uuid uuid NOT NULL DEFAULT gen_uuid_v7(now()),
   created_at timestamptz NOT NULL DEFAULT now(),
-  priority smallint DEFAULT 100,
-  payload_uuid uuid REFERENCES swoop.payload_cache ON DELETE RESTRICT,
-  workflow_version smallint NOT NULL,
+  handler_name text NOT NULL,
   handler_type text NOT NULL,
+  parent_uuid uuid, -- reference omitted, we don't need referential integrity
+  payload_uuid uuid REFERENCES swoop.payload_cache ON DELETE RESTRICT,
+  priority smallint DEFAULT 100,
+  workflow_version smallint,
 
   CONSTRAINT uuid_timestamp_matches_created_at CHECK (
     timestamp_from_uuid_v7(action_uuid) = date_trunc('ms', created_at)
@@ -158,6 +158,7 @@ CREATE TABLE swoop.action (
         action_name IS NOT NULL
         AND payload_uuid IS NOT NULL
         AND parent_uuid IS NULL
+        AND workflow_version IS NOT NULL
     END
   )
 ) PARTITION BY RANGE (created_at);
