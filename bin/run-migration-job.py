@@ -45,7 +45,7 @@ def strtobool(val) -> bool:
     elif val in ("n", "no", "f", "false", "off", "0"):
         return False
     else:
-        raise ValueError("invalid truth value %r" % (val,))
+        raise ValueError(f"invalid truth value {val!r}")
 
 
 async def run_migrations() -> None:
@@ -94,8 +94,8 @@ async def run_migrations() -> None:
             )
         else:
             stderr(
-                f"The current version of the database is incompatible with the desired"
-                "target version {version} and action {action}"
+                "The current version of the database is incompatible with the desired"
+                f"target version {version} and action {action}"
             )
 
 
