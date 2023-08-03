@@ -53,8 +53,6 @@ def int_or_none(val):
 
 
 async def run_migrations() -> None:
-    dbname: str = os.environ["PGDATABASE"]
-
     rollback = strtobool(os.environ.get("ROLLBACK", "false"))
     version = int_or_none(os.environ.get("VERSION"))
     no_wait = strtobool(os.environ.get("NO_WAIT", "false"))
@@ -82,15 +80,13 @@ async def run_migrations() -> None:
                 time.sleep(2)
 
         if rollback:
-            stderr(f"Rolling back database {dbname} to version {version}")
+            stderr(f"Rolling back database to version {version}")
             direction = "down"
         else:
-            stderr(f"Migrating database {dbname} to version {version}")
+            stderr(f"Migrating database to version {version}")
             direction = "up"
 
-        await swoop_db.migrate(
-            target=version, direction=direction, database=dbname, conn=conn
-        )
+        await swoop_db.migrate(target=version, direction=direction, conn=conn)
 
 
 if __name__ == "__main__":
