@@ -1,24 +1,24 @@
 #!/usr/bin/env python
 """
-This script will either migrate or rollback the swoop database to a specified
-migration version. The migration version, action type (of either migrate/rollback),
-and an override parameter are all specified in the values.yml from the Swoop-DB helm
-chart.
+This script automates applying migrations to a swoop database as created by
+./db-initialization.py. By default it will migrate the database forward to
+the most-recent schema version after waiting for all swoop application
+connections to be closed, but a few environment variables can be used to
+change that default behavior:
 
-It requires the following environment variables be set:
-
-    - PGHOST:
-          Postgres K8s service name which will be used to connect to the database
-    - PGUSER:
-          name of the user (role) that will perform the migrations
-    - PGPORT:
-          port number of the database container
-    - PGDATABASE: name of the database which will be used for migrations
-    - ACTION: name of the action performed, either migrate or rollback
+    - ROLLBACK: boolean flag required when target version is less than current
     - VERSION: the migration version to which to migrate/rollback the database
-    - NO_WAIT: override option to skip waiting for active connections to close.
-    - Any additional libpq-supported connection parameters
-          (https://www.postgresql.org/docs/current/libpq-envars.html)
+    - NO_WAIT: override option to skip waiting for active connections to close
+
+The script uses standard libpq-supported connection environment variables
+(https://www.postgresql.org/docs/current/libpq-envars.html), so specify these
+as required to connect to the database. Common vars include:
+
+    - PGHOST: hostname or IP address of the postgres cluster host
+    - PGPORT: port number of the postgres server
+    - PGUSER: name of the user (role) that will perform the migrations
+    - PGPASSWORD: password of the user (role)
+    - PGDATABASE: name of the database onto which to apply migrations
 """
 import asyncio
 import os
