@@ -45,19 +45,26 @@ def strtobool(val) -> bool:
     elif val in ("n", "no", "f", "false", "off", "0"):
         return False
     else:
-        raise ValueError(f"invalid truth value {val!r}")
+        raise ValueError(f"invalid boolean value {val!r}")
+
+
+def int_or_none(val):
+    return int(val) if val else None
 
 
 async def run_migrations() -> None:
     dbname: str = os.environ["PGDATABASE"]
 
-    action = os.environ["ACTION"]
-    version = int(os.environ["VERSION"])
-    no_wait = strtobool(os.environ["NO_WAIT"])
+    rollback = strtobool(os.environ.get("ROLLBACK", "false"))
+    version = int_or_none(os.environ.get("VERSION"))
+    no_wait = strtobool(os.environ.get("NO_WAIT", "false"))
 
     swoop_db = SwoopDB()
 
     async with swoop_db.get_db_connection() as conn:
+        current_version = await swoop_db.get_current_version(conn=conn)
+        if current_version == version:
+            return
         # Wait for all active connections from user roles to be closed
         active_sessions = not no_wait
         while active_sessions:
@@ -74,29 +81,16 @@ async def run_migrations() -> None:
             if active_sessions:
                 time.sleep(2)
 
-        current_version = await swoop_db.get_current_version(conn=conn)
-        version_compatible = True
-
-        if action == "rollback":
+        if rollback:
             stderr(f"Rolling back database {dbname} to version {version}")
             direction = "down"
-            if current_version is not None:
-                version_compatible = version <= current_version
         else:
             stderr(f"Migrating database {dbname} to version {version}")
             direction = "up"
-            if current_version is not None:
-                version_compatible = version >= current_version
 
-        if version_compatible:
-            await swoop_db.migrate(
-                target=version, direction=direction, database=dbname, conn=conn
-            )
-        else:
-            stderr(
-                "The current version of the database is incompatible with the desired"
-                f"target version {version} and action {action}"
-            )
+        await swoop_db.migrate(
+            target=version, direction=direction, database=dbname, conn=conn
+        )
 
 
 if __name__ == "__main__":
