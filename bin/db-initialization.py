@@ -10,8 +10,8 @@ It requires the following environment variables be set:
           swoop-caboose role username and password
     - CONDUCTOR_ROLE_USER and CONDUCTOR_ROLE_PASS:
           swoop-conductor role username and password
-    - MIGRATION_ROLE_USER and MIGRATION_ROLE_PASS:
-          username and password for migration role
+    - OWNER_ROLE_USER and OWNER_ROLE_PASS:
+          username and password for owner role
     - Any additional libpq-supported connection parameters
           (https://www.postgresql.org/docs/current/libpq-envars.html)
 """
@@ -24,8 +24,6 @@ from buildpg import V, render
 
 from swoop.db import SwoopDB
 
-OWNER_ROLE_NAME = "swoop"
-OWNER_ROLE = "OWNER_ROLE"
 APPLICATION_ROLES: list[str] = [
     "API_ROLE",
     "CABOOSE_ROLE",
