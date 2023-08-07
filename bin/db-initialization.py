@@ -12,6 +12,8 @@ It requires the following environment variables be set:
           swoop-conductor role username and password
     - OWNER_ROLE_USER and OWNER_ROLE_PASS:
           username and password for owner role
+    - RW_ROLE_USER and RW_ROLE_PASS:
+          username and password for swoop read/write group role
     - Any additional libpq-supported connection parameters
           (https://www.postgresql.org/docs/current/libpq-envars.html)
 """
@@ -45,16 +47,25 @@ async def create_owner_role(conn: asyncpg.Connection, owner_role_name: str) -> N
     await conn.execute(q, *p)
 
 
+async def create_swoop_rw_role(conn: asyncpg.Connection, rw_role_name: str) -> None:
+    q, p = render(
+        "CREATE ROLE :un WITH LOGIN PASSWORD ':pw'",
+        un=V(rw_role_name),
+        pw=V(os.environ["RW_ROLE_PASS"]),
+    )
+    await conn.execute(q, *p)
+
+
 async def create_application_role(
     conn: asyncpg.Connection,
     role: str,
-    owner_role_name: str,
+    rw_role_name: str,
 ) -> None:
     q, p = render(
         "CREATE ROLE :un WITH LOGIN IN ROLE :ir PASSWORD ':pw'",
         un=V(os.environ[f"{role}_USER"]),
         pw=V(os.environ[f"{role}_PASS"]),
-        ir=V(owner_role_name),
+        ir=V(rw_role_name),
     )
     await conn.execute(q, *p)
 
@@ -81,6 +92,8 @@ async def post_create_init(conn: asyncpg.Connection, owner_role_name: str) -> No
         GRANT ALL ON ALL TABLES IN SCHEMA partman TO :dbo;
         GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA partman TO :dbo;
         GRANT EXECUTE ON ALL PROCEDURES IN SCHEMA partman TO :dbo;
+        REVOKE ALL ON DATABASE swoop FROM PUBLIC;
+        REVOKE CREATE ON SCHEMA public FROM PUBLIC;
         """,
         dbo=V(owner_role_name),
     )
@@ -90,6 +103,7 @@ async def post_create_init(conn: asyncpg.Connection, owner_role_name: str) -> No
 async def db_initialization() -> None:
     dbname: str = os.environ["PGDATABASE"]
     owner: str = os.environ["OWNER_ROLE_USER"]
+    rwuser: str = os.environ["RW_ROLE_USER"]
 
     async with SwoopDB.get_db_connection(database="postgres") as conn:
         try:
@@ -98,10 +112,16 @@ async def db_initialization() -> None:
         except asyncpg.DuplicateObjectError:
             stderr("Owner already exists, skipping.")
 
+        try:
+            stderr(f"Creating swoop read/write role '{rwuser}'...")
+            await create_swoop_rw_role(conn, rwuser)
+        except asyncpg.DuplicateObjectError:
+            stderr("Swoop read/write role already exists, skipping.")
+
         for role in APPLICATION_ROLES:
             try:
                 stderr(f"Creating application role {role}...")
-                await create_application_role(conn, role, owner)
+                await create_application_role(conn, role, rwuser)
             except asyncpg.DuplicateObjectError:
                 stderr("Role already exists, skipping.")
 

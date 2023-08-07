@@ -63,9 +63,22 @@ async def run_migrations() -> None:
         current_version = await swoop_db.get_current_version(conn=conn)
         if current_version == version:
             return
+
         # Wait for all active connections from user roles to be closed
         active_sessions = not no_wait
         while active_sessions:
+            # Revoke connect privileges from swoop R/W group role
+            await conn.execute(
+                """
+                    DO $_$
+                        BEGIN
+                            EXECUTE FORMAT('REVOKE CONNECT on database %s FROM %s',
+                            CURRENT_DATABASE(), 'swoop_readwrite');
+                        END
+                    $_$;
+                """
+            )
+
             active_sessions = await conn.fetchval(
                 """
                 SELECT EXISTS(
@@ -87,6 +100,18 @@ async def run_migrations() -> None:
             direction = "up"
 
         await swoop_db.migrate(target=version, direction=direction, conn=conn)
+
+        # Grant connect privileges back to swoop R/W group role
+        await conn.execute(
+            """
+                DO $_$
+                    BEGIN
+                        EXECUTE FORMAT('GRANT CONNECT on database %s TO %s',
+                        CURRENT_DATABASE(), 'swoop_readwrite');
+                    END
+                $_$;
+            """
+        )
 
 
 if __name__ == "__main__":
