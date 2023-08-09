@@ -30,6 +30,8 @@ APPLICATION_ROLES: list[str] = [
     "CONDUCTOR_ROLE",
 ]
 
+SWOOP_RW_ROLE_NAME = "swoop_readwrite"
+
 
 def stderr(*args, **kwargs) -> None:
     kwargs["file"] = sys.stderr
@@ -45,16 +47,24 @@ async def create_owner_role(conn: asyncpg.Connection, owner_role_name: str) -> N
     await conn.execute(q, *p)
 
 
+async def create_swoop_rw_role(conn: asyncpg.Connection, group_name: str) -> None:
+    q, p = render(
+        "CREATE ROLE :un",
+        un=V(group_name),
+    )
+    await conn.execute(q, *p)
+
+
 async def create_application_role(
     conn: asyncpg.Connection,
     role: str,
-    owner_role_name: str,
+    group_name: str,
 ) -> None:
     q, p = render(
         "CREATE ROLE :un WITH LOGIN IN ROLE :ir PASSWORD ':pw'",
         un=V(os.environ[f"{role}_USER"]),
         pw=V(os.environ[f"{role}_PASS"]),
-        ir=V(owner_role_name),
+        ir=V(group_name),
     )
     await conn.execute(q, *p)
 
@@ -81,6 +91,17 @@ async def post_create_init(conn: asyncpg.Connection, owner_role_name: str) -> No
         GRANT ALL ON ALL TABLES IN SCHEMA partman TO :dbo;
         GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA partman TO :dbo;
         GRANT EXECUTE ON ALL PROCEDURES IN SCHEMA partman TO :dbo;
+        REVOKE ALL ON DATABASE swoop FROM PUBLIC;
+        REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+        CREATE SCHEMA IF NOT EXISTS swoop AUTHORIZATION :dbo;
+        GRANT :dbo TO current_user;
+        SET ROLE :dbo;
+        GRANT CONNECT ON DATABASE swoop TO swoop_readwrite;
+        GRANT USAGE, CREATE ON SCHEMA swoop TO swoop_readwrite;
+        ALTER DEFAULT PRIVILEGES IN SCHEMA swoop GRANT SELECT,
+        INSERT, UPDATE, DELETE ON TABLES TO swoop_readwrite;
+        ALTER DEFAULT PRIVILEGES IN SCHEMA swoop GRANT USAGE ON
+        SEQUENCES TO swoop_readwrite;
         """,
         dbo=V(owner_role_name),
     )
@@ -98,10 +119,16 @@ async def db_initialization() -> None:
         except asyncpg.DuplicateObjectError:
             stderr("Owner already exists, skipping.")
 
+        try:
+            stderr(f"Creating swoop read/write role '{SWOOP_RW_ROLE_NAME}'...")
+            await create_swoop_rw_role(conn, SWOOP_RW_ROLE_NAME)
+        except asyncpg.DuplicateObjectError:
+            stderr("Swoop read/write role already exists, skipping.")
+
         for role in APPLICATION_ROLES:
             try:
                 stderr(f"Creating application role {role}...")
-                await create_application_role(conn, role, owner)
+                await create_application_role(conn, role, SWOOP_RW_ROLE_NAME)
             except asyncpg.DuplicateObjectError:
                 stderr("Role already exists, skipping.")
 
