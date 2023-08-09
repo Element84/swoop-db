@@ -94,14 +94,14 @@ async def post_create_init(conn: asyncpg.Connection, owner_role_name: str) -> No
         REVOKE ALL ON DATABASE swoop FROM PUBLIC;
         REVOKE CREATE ON SCHEMA public FROM PUBLIC;
         CREATE SCHEMA IF NOT EXISTS swoop AUTHORIZATION :dbo;
+        GRANT :dbo TO current_user;
+        SET ROLE :dbo;
         GRANT CONNECT ON DATABASE swoop TO swoop_readwrite;
         GRANT USAGE, CREATE ON SCHEMA swoop TO swoop_readwrite;
         ALTER DEFAULT PRIVILEGES IN SCHEMA swoop GRANT SELECT,
         INSERT, UPDATE, DELETE ON TABLES TO swoop_readwrite;
         ALTER DEFAULT PRIVILEGES IN SCHEMA swoop GRANT USAGE ON
         SEQUENCES TO swoop_readwrite;
-        ALTER DEFAULT PRIVILEGES IN SCHEMA swoop GRANT EXECUTE ON
-        FUNCTIONS TO swoop_readwrite;
         """,
         dbo=V(owner_role_name),
     )
