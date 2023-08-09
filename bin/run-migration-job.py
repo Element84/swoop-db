@@ -25,7 +25,12 @@ import os
 import sys
 import time
 
+import asyncpg
+from buildpg import V, render
+
 from swoop.db import SwoopDB
+
+SWOOP_RW_ROLE_NAME = "swoop_readwrite"
 
 
 def stderr(*args, **kwargs) -> None:
@@ -52,10 +57,64 @@ def int_or_none(val):
     return int(val) if val else None
 
 
+async def grant_connect_privileges(
+    conn: asyncpg.Connection,
+) -> None:
+    q, p = render(
+        """
+            DO $_$
+                BEGIN
+                    EXECUTE FORMAT('GRANT CONNECT on database %s TO :rw',
+                    CURRENT_DATABASE());
+                END
+            $_$;
+        """,
+        rw=V(SWOOP_RW_ROLE_NAME),
+    )
+    await conn.execute(q, *p)
+
+
+async def revoke_connect_privileges(
+    conn: asyncpg.Connection,
+) -> None:
+    q, p = render(
+        """
+            DO $_$
+                BEGIN
+                    EXECUTE FORMAT('REVOKE CONNECT on database %s FROM :rw',
+                    CURRENT_DATABASE());
+                END
+            $_$;
+        """,
+        rw=V(SWOOP_RW_ROLE_NAME),
+    )
+    await conn.execute(q, *p)
+
+
+async def active_connections_exist(conn):
+    return await conn.fetchval(
+        """
+        SELECT EXISTS(
+            SELECT * FROM pg_stat_activity
+            WHERE
+                datname = current_database()
+                AND usename != current_user
+        )
+        """,
+    )
+
+
+async def wait_for_other_connections_to_close(conn):
+    await revoke_connect_privileges(conn)
+
+    while await active_connections_exist(conn):
+        time.sleep(2)
+
+
 async def run_migrations() -> None:
     rollback = strtobool(os.environ.get("ROLLBACK", "false"))
     version = int_or_none(os.environ.get("VERSION"))
-    no_wait = strtobool(os.environ.get("NO_WAIT", "false"))
+    wait = not strtobool(os.environ.get("NO_WAIT", "false"))
 
     swoop_db = SwoopDB()
 
@@ -64,33 +123,8 @@ async def run_migrations() -> None:
         if current_version == version:
             return
 
-        # Wait for all active connections from user roles to be closed
-        active_sessions = not no_wait
-        while active_sessions:
-            # Revoke connect privileges from swoop R/W group role
-            await conn.execute(
-                """
-                    DO $_$
-                        BEGIN
-                            EXECUTE FORMAT('REVOKE CONNECT on database %s FROM %s',
-                            CURRENT_DATABASE(), 'swoop_readwrite');
-                        END
-                    $_$;
-                """
-            )
-
-            active_sessions = await conn.fetchval(
-                """
-                SELECT EXISTS(
-                    SELECT * FROM pg_stat_activity
-                    WHERE
-                        datname = current_database()
-                        AND usename != current_user
-                )
-                """,
-            )
-            if active_sessions:
-                time.sleep(2)
+        if wait:
+            await wait_for_other_connections_to_close(conn)
 
         if rollback:
             stderr(f"Rolling back database to version {version}")
@@ -101,17 +135,7 @@ async def run_migrations() -> None:
 
         await swoop_db.migrate(target=version, direction=direction, conn=conn)
 
-        # Grant connect privileges back to swoop R/W group role
-        await conn.execute(
-            """
-                DO $_$
-                    BEGIN
-                        EXECUTE FORMAT('GRANT CONNECT on database %s TO %s',
-                        CURRENT_DATABASE(), 'swoop_readwrite');
-                    END
-                $_$;
-            """
-        )
+        await grant_connect_privileges(conn)
 
 
 if __name__ == "__main__":
