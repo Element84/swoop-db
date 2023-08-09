@@ -119,23 +119,24 @@ async def run_migrations() -> None:
     swoop_db = SwoopDB()
 
     async with swoop_db.get_db_connection() as conn:
-        current_version = await swoop_db.get_current_version(conn=conn)
-        if current_version == version:
-            return
+        try:
+            current_version = await swoop_db.get_current_version(conn=conn)
+            if current_version == version:
+                return
 
-        if wait:
-            await wait_for_other_connections_to_close(conn)
+            if wait:
+                await wait_for_other_connections_to_close(conn)
 
-        if rollback:
-            stderr(f"Rolling back database to version {version}")
-            direction = "down"
-        else:
-            stderr(f"Migrating database to version {version}")
-            direction = "up"
+            if rollback:
+                stderr(f"Rolling back database to version {version}")
+                direction = "down"
+            else:
+                stderr(f"Migrating database to version {version}")
+                direction = "up"
 
-        await swoop_db.migrate(target=version, direction=direction, conn=conn)
-
-        await grant_connect_privileges(conn)
+            await swoop_db.migrate(target=version, direction=direction, conn=conn)
+        finally:
+            await grant_connect_privileges(conn)
 
 
 if __name__ == "__main__":
