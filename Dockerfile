@@ -34,7 +34,6 @@ ENV PGUSER "${PGUSER:-postgres}"
 COPY --from=APP /opt/swoop/db/swoop-db-venv /opt/swoop/db/swoop-db-venv
 ENV PATH=/opt/swoop/db/swoop-db-venv/bin:$PATH
 
-
 RUN mkdir -p /opt/swoop/db/scripts
 COPY bin/db-initialization.py /opt/swoop/db/scripts/db-initialization.py
 COPY bin/run-migration-job.py /opt/swoop/db/scripts/run-migration-job.py
