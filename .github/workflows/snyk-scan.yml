@@ -29,6 +29,7 @@ jobs:
         with:
           args:
             --sarif-file-output=snyk.sarif
+            --policy-path=.snyk
             --severity-threshold=high # Forces fail on high-severity vulnerabilities
 
         # Push the Snyk Code results into GitHub Code Scanning tab
