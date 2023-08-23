@@ -29,7 +29,8 @@ jobs:
         with:
           args:
             --sarif-file-output=snyk.sarif
-            --severity-threshold=critical # Forces fail on critical-severity vulnerabilities
+            --policy-path=.snyk
+            --severity-threshold=high # Forces fail on high-severity vulnerabilities
 
         # Push the Snyk Code results into GitHub Code Scanning tab
       - name: Upload python scan result to GitHub Code Scanning
@@ -49,7 +50,7 @@ jobs:
             --file=Dockerfile
             --sarif-file-output=snyk.sarif
             --policy-path=.snyk
-            --severity-threshold=critical # Forces fail on critical-severity vulnerabilities
+            --severity-threshold=high # Forces fail on high-severity vulnerabilities
 
         # Push the Snyk Code results into GitHub Code Scanning tab
       - name: Upload docker scan result to GitHub Code Scanning
