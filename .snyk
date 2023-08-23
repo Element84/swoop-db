@@ -2,21 +2,9 @@
 version: v1.22.1
 
 ignore:
-  SNYK-DEBIAN11-CURL-3320493:
+  SNYK-DEBIAN12-POSTGRESQL15-5838227:
     - '*':
-        reason: Patched by using debian bookworm (12) and installing recommended libcurl libraries.
-        expires: 2023-06-30T17:33:45.004Z
-  SNYK-DEBIAN11-AOM-1290331:
-    - '*':
-        reason: Patched by using debian bookworm (12) and installing recommended libaom libraries.
-        expires: 2023-06-30T17:33:45.004Z
-  SNYK-DEBIAN11-AOM-1298721:
-    - '*':
-        reason: Patched by using debian bookworm (12) and installing recommended libaom libraries.
-        expires: 2023-06-30T17:33:45.004Z
-  SNYK-DEBIAN11-AOM-1300249:
-    - '*':
-        reason: Patched by using debian bookworm (12) and installing recommended libaom libraries.
-        expires: 2023-06-30T17:33:45.004Z
+        reason: Although postgresql-15 package has been flagged as vulnerable, the postgres 15.4 has been identified as the fix which is already contained in the latest postgres:15 base image.
+        expires: 2023-09-30T17:33:45.004Z
 
 patch: {}
