@@ -1,10 +1,6 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
 version: v1.22.1
 
-ignore:
-  SNYK-DEBIAN12-POSTGRESQL15-5838227:
-    - '*':
-        reason: Although postgresql-15 package has been flagged as vulnerable, the postgres 15.4 has been identified as the fix which is already contained in the latest postgres:15 base image.
-        expires: 2023-09-30T17:33:45.004Z
+ignore: {}
 
 patch: {}
