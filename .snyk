@@ -2,9 +2,9 @@
 version: v1.22.1
 
 ignore:
-  SNYK-DEBIAN12-POSTGRESQL15-5838227:
+  SNYK-DEBIAN12-LIBWEBP-5893095:
     - '*':
-        reason: Although postgresql-15 package has been flagged as vulnerable, the postgres 15.4 has been identified as the fix which is already contained in the latest postgres:15 base image.
-        expires: 2023-09-30T17:33:45.004Z
+        reason: Although libwebp package has been flagged as vulnerable, we're not installing libwebp on our base image.
+        expires: 2023-10-19T00:00:00.000Z
 
 patch: {}
